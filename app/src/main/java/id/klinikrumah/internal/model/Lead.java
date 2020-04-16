@@ -6,22 +6,22 @@ import id.klinikrumah.internal.base.BaseModel;
 
 public class Lead extends BaseModel {
     @SerializedName("client")
-    Client client;
+    private Client client;
 
     @SerializedName("project")
-    Project project;
+    private Project project;
 
     @SerializedName("action")
-    Action action;
+    private Action action;
 
     @SerializedName("description")
-    String description;
+    private String description;
 
     @SerializedName("budget")
-    String budget;
+    private String budget;
 
     @SerializedName("to_do")
-    String toDo;
+    private String toDo;
 
     public Client getClient() {
         return client;

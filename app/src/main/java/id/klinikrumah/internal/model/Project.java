@@ -6,25 +6,28 @@ import id.klinikrumah.internal.base.BaseModel;
 
 public class Project extends BaseModel {
     @SerializedName("client")
-    Client client;
+    private Client client;
+
+    @SerializedName("location")
+    private String location;
 
     @SerializedName("size_building")
-    String sizeBuilding;
+    private String sizeBuilding;
 
     @SerializedName("size_land")
-    String sizeLand;
+    private String sizeLand;
 
     @SerializedName("value")
-    String value;
+    private String value;
 
     @SerializedName("status")
-    String status;
+    private String status;
 
     @SerializedName("date_start")
-    String dateStart;
+    private String dateStart;
 
     @SerializedName("date_finish")
-    String dateFinish;
+    private String dateFinish;
 
     public Client getClient() {
         return client;
@@ -32,6 +35,14 @@ public class Project extends BaseModel {
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getSizeBuilding() {

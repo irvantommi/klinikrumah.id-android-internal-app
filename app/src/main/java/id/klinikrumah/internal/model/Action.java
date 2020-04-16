@@ -6,16 +6,16 @@ import id.klinikrumah.internal.base.BaseModel;
 
 public class Action extends BaseModel {
     @SerializedName("survey")
-    String survey;
+    private String survey;
 
     @SerializedName("point_to_discuss")
-    String pointToDiscuss;
+    private String pointToDiscuss;
 
     @SerializedName("draft_design_link")
-    String draftDesignLink;
+    private String draftDesignLink;
 
     @SerializedName("offering")
-    String offering;
+    private String offering;
 
     public String getSurvey() {
         return survey;

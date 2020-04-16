@@ -1,4 +1,4 @@
-package id.klinikrumah.internal.controller;
+package id.klinikrumah.internal.rest;
 
 import com.google.gson.JsonObject;
 
@@ -14,7 +14,7 @@ import retrofit2.http.HTTP;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 
-public interface SplashController {
+public interface ApiInterface {
     @GET("lead_list")
     Call<List<Lead>> getLeadList();
 

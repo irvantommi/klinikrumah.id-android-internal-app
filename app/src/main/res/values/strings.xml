@@ -3,4 +3,20 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <!-- v1.0.0 -->
+    <string name="name">Nama</string>
+    <string name="location">Lokasi</string>
+    <string name="project">Proyek</string>
+    <string name="action">Aksi</string>
+    <string name="survey">Survei</string>
+    <string name="point_to_discuss">Pokok Diskusi</string>
+    <string name="draft_design">Konsep Desain</string>
+    <string name="offering">Penawaran</string>
+    <string name="description">Keterangan</string>
+    <string name="budget">Anggaran</string>
+    <string name="size_building">Ukuran Bangunan</string>
+    <string name="size_land">Luas Tanah</string>
+    <string name="date">Tanggal</string>
+    <string name="todo">PR</string>
+    <string name="phone_no">No.HP</string>
 </resources>
