@@ -25,7 +25,7 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Call<List<Lead>> leadListCall = api.getLeadList();
+        /*Call<List<Lead>> leadListCall = api.getLeadList();
         leadListCall.enqueue(new Callback<List<Lead>>() {
             @Override
             public void onResponse(Call<List<Lead>> call, Response<List<Lead>> response) {
@@ -36,7 +36,9 @@ public class SplashActivity extends BaseActivity {
             public void onFailure(Call<List<Lead>> call, Throwable t) {
                 Log.e("Retrofit Get", t.toString());
             }
-        });
+        });*/
+        // temp, dummy
+        LeadListActivity.show(this, app.getGson().toJson(getDummy()));
     }
 
     @NotNull

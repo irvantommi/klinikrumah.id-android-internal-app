@@ -7,15 +7,19 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.text.TextUtils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.regex.Pattern;
 
-public class CommonFunction {
+import id.klinikrumah.internal.constant.S;
+
+public class CommonFunc {
     public static boolean isValidEmail(String email) {
         Pattern emailPattern = Pattern.compile("^(([^<>()\\[\\].,;:\\s@\"]+(\\.[^<>()\\[\\].,;:\\s@\"]+)*)|(\".+\"))@(([^<>()\\[\\].,;:\\s@\"]+\\.)+[^<>()\\[\\].,;:\\s@\"]{2,})$");
         return !TextUtils.isEmpty(email) && emailPattern.matcher(email).matches();
     }
 
-    public static boolean isConnectToInternet(Context context) {
+    public static boolean isConnectToInternet(@NotNull Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Network[] networks = new Network[0];
@@ -39,5 +43,14 @@ public class CommonFunction {
             }
         }
         return false;
+    }
+
+    @NotNull
+    public static Boolean isEmptyString(String input) {
+        return input == null || input.trim().isEmpty();
+    }
+
+    public static String setDashIfEmpty(String input) {
+        return TextUtils.isEmpty(input) ? S.DASH : input;
     }
 }

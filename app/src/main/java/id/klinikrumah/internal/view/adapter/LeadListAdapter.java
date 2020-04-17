@@ -12,6 +12,8 @@ import java.util.List;
 
 import id.klinikrumah.internal.R;
 import id.klinikrumah.internal.model.Lead;
+import id.klinikrumah.internal.model.Project;
+import id.klinikrumah.internal.util.CommonFunc;
 
 public class LeadListAdapter extends RecyclerView.Adapter<LeadListAdapter.ViewHolder> {
     private List<Lead> leadList;
@@ -35,7 +37,11 @@ public class LeadListAdapter extends RecyclerView.Adapter<LeadListAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int i) {
         final Lead lead = leadList.get(i);
-        holder.tvCity.setText(lead.getName());
+        Project project = lead.getProject();
+        holder.tvLeadNo.setText(String.format("L%s", i + 1));
+        holder.tvProjectName.setText(CommonFunc.setDashIfEmpty(project.getName()));
+        holder.tvProjectLocation.setText(CommonFunc.setDashIfEmpty(project.getLocation()));
+        holder.tvClientName.setText(CommonFunc.setDashIfEmpty(lead.getClient().getName()));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,12 +69,18 @@ public class LeadListAdapter extends RecyclerView.Adapter<LeadListAdapter.ViewHo
         void selectLead(Lead lead);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvCity;
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView tvLeadNo;
+        TextView tvProjectName;
+        TextView tvProjectLocation;
+        TextView tvClientName;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
-//            tvCity = view.findViewById(R.id.tv_city);
+            tvLeadNo = view.findViewById(R.id.tv_lead_no);
+            tvProjectName = view.findViewById(R.id.tv_project_name);
+            tvProjectLocation = view.findViewById(R.id.tv_project_location);
+            tvClientName = view.findViewById(R.id.tv_client_name);
         }
     }
 }
