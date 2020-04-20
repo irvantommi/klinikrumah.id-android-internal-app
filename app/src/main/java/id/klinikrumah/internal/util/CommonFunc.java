@@ -7,6 +7,7 @@ import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.text.Editable;
 import android.text.TextUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -66,5 +67,10 @@ public class CommonFunc {
 
     public static String setDefaultIfEmpty(String input) {
         return TextUtils.isEmpty(input) ? S.DASH : input;
+    }
+
+    @NotNull
+    public static String setStringFromEditable(Editable input) {
+        return input != null ? input.toString().trim() : "";
     }
 }

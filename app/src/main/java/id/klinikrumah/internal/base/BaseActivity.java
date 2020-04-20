@@ -1,7 +1,10 @@
 package id.klinikrumah.internal.base;
 
 import android.annotation.SuppressLint;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Editable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -41,6 +44,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         api = ApiClient.getRetrofit().create(ApiInterface.class);
         eventBus = app.getEventBus();
+        if (getSupportActionBar() != null) {
+//            getSupportActionBar().getNavigationIcon().setColorFilter(getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.SRC_ATOP);
+            final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_material);
+            upArrow.setColorFilter(getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.SRC_ATOP);
+            getSupportActionBar().setHomeAsUpIndicator(upArrow);
+        }
     }
 
     @SuppressLint("InflateParams")
@@ -80,5 +89,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected String setDefaultIfEmpty(String input) {
         return CommonFunc.setDefaultIfEmpty(input);
+    }
+
+    protected String setString(Editable input) {
+        return CommonFunc.setStringFromEditable(input);
     }
 }

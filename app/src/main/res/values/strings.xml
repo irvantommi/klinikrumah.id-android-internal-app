@@ -25,4 +25,9 @@
     <string name="data_not_found">Data tidak ditemukan</string>
     <string name="data_not_found_content">Silakan buat data baru dengan klik tombol</string>
     <string name="create_new">Buat Baru</string>
+    <string name="edit">Ubah</string>
+    <string name="submit">Kirim</string>
+    <string name="update">Perbarui</string>
+    <string name="cancel">Batalkan</string>
+    <string name="search">Cari</string>
 </resources>

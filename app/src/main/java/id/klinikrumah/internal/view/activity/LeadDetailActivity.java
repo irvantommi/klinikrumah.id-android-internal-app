@@ -3,6 +3,8 @@ package id.klinikrumah.internal.view.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,27 +26,28 @@ import id.klinikrumah.internal.model.Project;
 import id.klinikrumah.internal.util.CommonFunc;
 
 public class LeadDetailActivity extends BaseActivity {
+    private static final String TITLE = "Leads Detail";
     private static final String LEAD = "lead";
+    private static final String WA_LINK = "https://wa.me/%s";
     // other class
 
     // from xml
-    TextView tvClientName;
-    TextView tvProjectLocation;
-    TextView tvContact;
-    ImageView ivDial;
-    ImageView ivWA;
-    TextView tvProjectName;
-    TextView tvSurvey;
-    TextView tvPointToDiscuss;
-    TextView tvDraftDesign;
-    TextView tvOffering;
-    TextView tvDescription;
-    TextView tvBudget;
-    TextView tvSizeBuilding;
-    TextView tvSizeLand;
-    TextView tvDate;
-    TextView tvTodo;
-    FloatingActionButton fabEdit;
+    private TextView tvClientName;
+    private TextView tvProjectLocation;
+    private TextView tvContact;
+    private ImageView ivDial;
+    private ImageView ivWA;
+    private TextView tvProjectName;
+    private TextView tvSurvey;
+    private TextView tvPointToDiscuss;
+    private TextView tvDraftDesign;
+    private TextView tvOffering;
+    private TextView tvDescription;
+    private TextView tvBudget;
+    private TextView tvSizeBuilding;
+    private TextView tvSizeLand;
+    private TextView tvDate;
+    private TextView tvTodo;
     // member var
     private Lead lead = new Lead();
 
@@ -57,26 +60,13 @@ public class LeadDetailActivity extends BaseActivity {
         ((Activity) context).overridePendingTransition(0, 0);
     }
 
-    /*@Override
-    protected void onResume() {
-        super.onResume();
-        eventBus.register(this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-//        controller.cancelPendingRequests();
-        eventBus.unregister(this);
-    }*/
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lead_detail);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Leads Detail");
+            getSupportActionBar().setTitle(TITLE);
         }
         tvClientName = findViewById(R.id.tv_client_name);
         tvProjectLocation = findViewById(R.id.tv_project_location);
@@ -94,11 +84,11 @@ public class LeadDetailActivity extends BaseActivity {
         tvSizeLand = findViewById(R.id.tv_size_land);
         tvDate = findViewById(R.id.tv_date);
         tvTodo = findViewById(R.id.tv_todo);
-        fabEdit = findViewById(R.id.fab_edit);
+        FloatingActionButton fabEdit = findViewById(R.id.fab_edit);
         fabEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                LeadActivity.show(LeadDetailActivity.this, app.getGson().toJson(lead));
             }
         });
         if (getIntent().hasExtra(LEAD)) {
@@ -116,8 +106,6 @@ public class LeadDetailActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        Intent myIntent = new Intent(getApplicationContext(), LeadListActivity.class);
-//        startActivityForResult(myIntent, 0);
         finish();
         return true;
     }
@@ -141,7 +129,10 @@ public class LeadDetailActivity extends BaseActivity {
             ivWA.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    CommonFunc.openUrl(view.getContext(), String.format("https://wa.me/%s", contact));
+                    if (contact.startsWith("0")) {
+                        String countryCodeIndonesia = "+62" + contact.substring(1);
+                        CommonFunc.openUrl(view.getContext(), String.format(WA_LINK, countryCodeIndonesia));
+                    }
                 }
             });
         } else {
