@@ -18,5 +18,11 @@
     <string name="size_land">Luas Tanah</string>
     <string name="date">Tanggal</string>
     <string name="todo">PR</string>
-    <string name="phone_no">No.HP</string>
+    <string name="contact">Kontak</string>
+    <string name="error_general">Halaman Tidak Dapat Diakses</string>
+    <string name="error_general_content">Mohon maaf, terjadi kesalahan. Silakan coba kembali</string>
+    <string name="try_again">Coba Lagi</string>
+    <string name="data_not_found">Data tidak ditemukan</string>
+    <string name="data_not_found_content">Silakan buat data baru dengan klik tombol</string>
+    <string name="create_new">Buat Baru</string>
 </resources>

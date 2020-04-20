@@ -45,10 +45,10 @@ public class SplashActivity extends BaseActivity {
     private Lead setDummy(String clientName, String location, String projectName, String survey,
                           String pointToDiscuss, String draftDesign, String offering, String desc,
                           String budget, String sizeBuilding, String sizeLand, String leadDate,
-                          String todo, String phoneNo) {
+                          String todo, String contact) {
         Client client = new Client();
         client.setName(clientName);
-        client.setPhoneNo(phoneNo);
+        client.setContact(contact);
 
         Project project = new Project();
         project.setName(projectName);

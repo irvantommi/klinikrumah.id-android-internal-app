@@ -60,16 +60,18 @@ public class LeadListActivity extends BaseActivity {
             hideError();
             leadList = Arrays.asList(app.getGson().fromJson(getIntent().getStringExtra(LEAD_LIST), Lead[].class));
         } else {
-             setError("Data tidak ditemukan", "Silakan buat data baru dengan klik tombol", "Buat Baru");
+             setError(getString(R.string.data_not_found), getString(R.string.data_not_found_content),
+                     getString(R.string.create_new));
         }
         adapter = new LeadListAdapter(new ArrayList<Lead>());
         adapter.setTaskListener(new LeadListAdapter.TaskListener() {
             @Override
             public void selectLead(Lead lead) {
-                Intent returnIntent = new Intent();
-                returnIntent.putExtra("city", app.getGson().toJson(lead));
-                setResult(Activity.RESULT_OK, returnIntent);
-                finish();
+                LeadDetailActivity.show(LeadListActivity.this, app.getGson().toJson(lead));
+//                Intent returnIntent = new Intent();
+//                returnIntent.putExtra("lead", app.getGson().toJson(lead));
+//                setResult(Activity.RESULT_OK, returnIntent);
+//                finish();
             }
         });
         rvLeadList.setAdapter(adapter);

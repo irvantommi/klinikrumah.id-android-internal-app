@@ -19,6 +19,7 @@ import id.klinikrumah.internal.App;
 import id.klinikrumah.internal.R;
 import id.klinikrumah.internal.rest.ApiClient;
 import id.klinikrumah.internal.rest.ApiInterface;
+import id.klinikrumah.internal.util.CommonFunc;
 
 public abstract class BaseActivity extends AppCompatActivity {
     // other class
@@ -75,5 +76,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void hideError() {
         flContainer.setVisibility(View.VISIBLE);
         llError.setVisibility(View.GONE);
+    }
+
+    protected String setDefaultIfEmpty(String input) {
+        return CommonFunc.setDefaultIfEmpty(input);
     }
 }

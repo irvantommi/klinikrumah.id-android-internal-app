@@ -8,8 +8,8 @@ public class Client extends BaseModel {
     @SerializedName("address")
     private String address;
 
-    @SerializedName("phone_no")
-    private String phoneNo;
+    @SerializedName("contact")
+    private String contact;
 
     public String getAddress() {
         return address;
@@ -19,11 +19,11 @@ public class Client extends BaseModel {
         this.address = address;
     }
 
-    public String getPhoneNo() {
-        return phoneNo;
+    public String getContact() {
+        return contact;
     }
 
-    public void setPhoneNo(String phoneNo) {
-        this.phoneNo = phoneNo;
+    public void setContact(String contact) {
+        this.contact = contact;
     }
 }

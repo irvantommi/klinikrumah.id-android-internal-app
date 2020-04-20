@@ -42,5 +42,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".view.activity.LeadListActivity" />
+        <activity android:name=".view.activity.LeadDetailActivity" />
     </application>
 </manifest>

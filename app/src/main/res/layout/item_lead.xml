@@ -72,7 +72,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                tools:text="L 1" />
+                tools:text="L1" />
 
             <ImageView
                 android:layout_width="wrap_content"

@@ -39,9 +39,9 @@ public class LeadListAdapter extends RecyclerView.Adapter<LeadListAdapter.ViewHo
         final Lead lead = leadList.get(i);
         Project project = lead.getProject();
         holder.tvLeadNo.setText(String.format("L%s", i + 1));
-        holder.tvProjectName.setText(CommonFunc.setDashIfEmpty(project.getName()));
-        holder.tvProjectLocation.setText(CommonFunc.setDashIfEmpty(project.getLocation()));
-        holder.tvClientName.setText(CommonFunc.setDashIfEmpty(lead.getClient().getName()));
+        holder.tvProjectName.setText(CommonFunc.setDefaultIfEmpty(project.getName()));
+        holder.tvProjectLocation.setText(CommonFunc.setDefaultIfEmpty(project.getLocation()));
+        holder.tvClientName.setText(CommonFunc.setDefaultIfEmpty(lead.getClient().getName()));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
