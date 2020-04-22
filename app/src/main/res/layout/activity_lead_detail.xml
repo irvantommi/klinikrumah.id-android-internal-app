@@ -35,21 +35,41 @@
                 android:textSize="16sp"
                 tools:text="Prof. Dr. Muhammad Irvan Tommi, Lc hafizhohullah ta'ala" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/location"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_project_location"
+            <LinearLayout
+                android:id="@+id/ll_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                tools:text="Jannatul Firdaus" />
+                android:layout_marginTop="8dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/location"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tv_project_location"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textColor="@android:color/black"
+                        android:textSize="16sp"
+                        tools:text="Jannatul Firdaus" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/ic_chevron_right_black_24dp" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

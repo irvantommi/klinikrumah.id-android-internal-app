@@ -1,12 +1,18 @@
 package id.klinikrumah.internal.view.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
+import android.provider.Settings;
 import android.view.KeyEvent;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -16,10 +22,27 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -29,14 +52,21 @@ import id.klinikrumah.internal.model.Action;
 import id.klinikrumah.internal.model.Client;
 import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.Project;
+import id.klinikrumah.internal.util.CommonFunc;
 
-public class LeadActivity extends BaseActivity {
+public class LeadActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks {
+    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private static final int REQUEST_CHECK_SETTINGS = 2;
+    private static final int REQUEST_SETTING_RESULT = 3;
+    private static final int INTERVAL = 10000;
+    private static final int FASTEST_INTERVAL = 5000;
     private static final String LEAD = "lead";
     // other class
 
     // from xml
     private TextInputEditText etClientName;
     private TextInputEditText etProjectLocation;
+    private TextView tvLatLong;
     private TextInputEditText etContact;
     private TextInputEditText etProjectName;
     private TextInputEditText etSurvey;
@@ -53,6 +83,8 @@ public class LeadActivity extends BaseActivity {
     private Lead lead = new Lead();
     private Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
     private boolean isUpdate = false;
+    private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
 
     public static void show(Context context, String lead) {
         Intent intent = new Intent(context, LeadActivity.class);
@@ -70,6 +102,8 @@ public class LeadActivity extends BaseActivity {
 
         etClientName = findViewById(R.id.et_client_name);
         etProjectLocation = findViewById(R.id.et_project_location);
+        tvLatLong = findViewById(R.id.tv_lat_long);
+        Button btnLatLong = findViewById(R.id.btn_lat_long);
         etContact = findViewById(R.id.et_contact);
         etProjectName = findViewById(R.id.et_project_name);
         etSurvey = findViewById(R.id.et_survey);
@@ -83,6 +117,12 @@ public class LeadActivity extends BaseActivity {
         etTodo = findViewById(R.id.et_todo);
         etDate = findViewById(R.id.et_date);
 
+        btnLatLong.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checkPermission();
+            }
+        });
         final DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
@@ -131,7 +171,7 @@ public class LeadActivity extends BaseActivity {
             }
         });
         if (getIntent().hasExtra(LEAD)) {
-            showHideProgressBar();
+//            showHideProgressBar();
             hideError();
             lead = app.getGson().fromJson(getIntent().getStringExtra(LEAD), Lead.class);
             if (lead != null) {
@@ -139,21 +179,125 @@ public class LeadActivity extends BaseActivity {
             }
             isUpdate = true;
         } else {
-            setError(getString(R.string.error_general), getString(R.string.error_general_content),
-                    getString(R.string.try_again));
+            isUpdate = false;
+//            setError(getString(R.string.error_general), getString(R.string.error_general_content),
+//                    getString(R.string.try_again));
         }
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(String.format("%s Leads", isUpdate ? "Perbarui" : "Buat"));
         }
+        // setLocationRequest
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(INTERVAL);
+        locationRequest.setFastestInterval(FASTEST_INTERVAL);
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        Intent myIntent = new Intent(getApplicationContext(), LeadListActivity.class);
-//        startActivityForResult(myIntent, 0);
-        finish();
-        return true;
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
+            if (permissions.length > 0 && permissions[0].equalsIgnoreCase(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    showLocationAccessDialog();
+                } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                    showPopUp();
+                }
+            }
+        }
+    }
+
+    private void showPopUp() {
+        startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), REQUEST_SETTING_RESULT);
+    }
+
+    private void checkPermission() {
+        if (Build.VERSION.SDK_INT > 22) {
+            String accessFineLocation = Manifest.permission.ACCESS_FINE_LOCATION;
+            List<String> permissionList = new ArrayList<>();
+            if (CommonFunc.isGranted(this, accessFineLocation)) {
+                showLocationAccessDialog();
+            } else {
+                permissionList.add(accessFineLocation);
+                String[] params = permissionList.toArray(new String[permissionList.size()]);
+                requestPermissions(params, MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            }
+        } else {
+            showLocationAccessDialog();
+        }
+    }
+
+    private void showLocationAccessDialog() {
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+        builder.setAlwaysShow(true);
+
+        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addApi(LocationServices.API)
+                .build();
+        googleApiClient.connect();
+
+        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(
+                googleApiClient, builder.build());
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(@NotNull LocationSettingsResult locationSettingsResult) {
+                final Status status = locationSettingsResult.getStatus();
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        getLastLocation();
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        try {
+                            status.startResolutionForResult(LeadActivity.this, REQUEST_CHECK_SETTINGS);
+                        } catch (IntentSender.SendIntentException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        getLastLocation();
+                        break;
+                }
+            }
+        });
+    }
+
+    private void getLastLocation() {
+        final FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NotNull LocationResult locationResult) {
+                for (Location location : locationResult.getLocations()) {
+                    setLatLong(location);
+                    fusedLocationClient.removeLocationUpdates(locationCallback);
+                }
+            }
+        };
+        fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location == null) {
+                    fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+                } else {
+                    setLatLong(location);
+                }
+            }
+        });
+    }
+
+    private void setLatLong(@NotNull Location location) {
+        tvLatLong.setText(String.format("%s, %s", location.getLatitude(), location.getLongitude()));
     }
 
     private void setData() {
@@ -169,6 +313,7 @@ public class LeadActivity extends BaseActivity {
         Project project = lead.getProject();
         if (project != null) {
             etProjectLocation.setText(project.getLocation());
+            tvLatLong.setText(project.getLatLong());
             etProjectName.setText(project.getName());
             etSizeBuilding.setText(project.getSizeBuilding());
             etSizeLand.setText(project.getSizeLand());
@@ -198,6 +343,7 @@ public class LeadActivity extends BaseActivity {
         Project project = isUpdate ? lead.getProject() : new Project();
         if (project != null) {
             project.setLocation(setString(etProjectLocation.getText()));
+            project.setLatLong(setString(tvLatLong.getText()));
             project.setName(setString(etProjectName.getText()));
             project.setSizeBuilding(setString(etSizeBuilding.getText()));
             project.setSizeLand(setString(etSizeLand.getText()));

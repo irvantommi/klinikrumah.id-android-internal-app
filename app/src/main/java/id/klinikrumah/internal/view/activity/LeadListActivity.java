@@ -59,7 +59,7 @@ public class LeadListActivity extends BaseActivity {
 
         handleIntent(getIntent());
         if (getIntent().hasExtra(LEAD_LIST)) {
-            showHideProgressBar();
+//            showHideProgressBar();
             hideError();
             leadList = Arrays.asList(app.getGson().fromJson(getIntent().getStringExtra(LEAD_LIST),
                     Lead[].class));

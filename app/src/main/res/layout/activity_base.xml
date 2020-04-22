@@ -11,7 +11,7 @@
 
     <LinearLayout
         android:id="@+id/ll_error"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center"
@@ -35,21 +35,23 @@
             android:textColor="@android:color/black"
             android:textSize="16sp"
             android:textStyle="bold"
-            tools:text="Data tidak ditemukan" />
+            android:gravity="center"
+            tools:text="Data tidak ditemukan Data tidak ditemukanData tidak ditemukan Data tidak ditemukan" />
 
         <TextView
             android:id="@+id/tv_base_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            tools:text="Silakan buat data baru dengan klik tombol" />
+            android:gravity="center"
+            tools:text="Silakan buat data baru dengan klik tombol Silakan buat data baru dengan klik tombol" />
 
         <Button
             android:id="@+id/btn_base"
+            style="@style/KRButton.Active"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textAllCaps="false"
             tools:text="Buat Baru" />
     </LinearLayout>
 

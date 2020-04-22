@@ -5,6 +5,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -14,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -45,11 +47,18 @@ public abstract class BaseActivity extends AppCompatActivity {
         api = ApiClient.getRetrofit().create(ApiInterface.class);
         eventBus = app.getEventBus();
         if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //            getSupportActionBar().getNavigationIcon().setColorFilter(getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.SRC_ATOP);
             final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.SRC_ATOP);
             getSupportActionBar().setHomeAsUpIndicator(upArrow);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        finish();
+        return true;
     }
 
     @SuppressLint("InflateParams")
@@ -66,7 +75,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         pbBase = rlBase.findViewById(R.id.pb_base);
 
         getLayoutInflater().inflate(layoutResID, flContainer, true);
-        super.setContentView(layoutResID);
+        super.setContentView(rlBase);
     }
 
     protected void showHideProgressBar() {
@@ -93,5 +102,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected String setString(Editable input) {
         return CommonFunc.setStringFromEditable(input);
+    }
+
+    protected String setString(CharSequence input) {
+        return CommonFunc.setStringFromCharSequence(input);
     }
 }

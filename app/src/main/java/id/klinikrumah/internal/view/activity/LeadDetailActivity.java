@@ -6,9 +6,11 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -28,11 +30,11 @@ import id.klinikrumah.internal.util.CommonFunc;
 public class LeadDetailActivity extends BaseActivity {
     private static final String TITLE = "Leads Detail";
     private static final String LEAD = "lead";
-    private static final String WA_LINK = "https://wa.me/%s";
     // other class
 
     // from xml
     private TextView tvClientName;
+    private LinearLayout llLocation;
     private TextView tvProjectLocation;
     private TextView tvContact;
     private ImageView ivDial;
@@ -65,10 +67,10 @@ public class LeadDetailActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lead_detail);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(TITLE);
         }
         tvClientName = findViewById(R.id.tv_client_name);
+        llLocation = findViewById(R.id.ll_location);
         tvProjectLocation = findViewById(R.id.tv_project_location);
         tvContact = findViewById(R.id.tv_contact);
         ivDial = findViewById(R.id.iv_dial);
@@ -91,8 +93,22 @@ public class LeadDetailActivity extends BaseActivity {
                 LeadActivity.show(LeadDetailActivity.this, app.getGson().toJson(lead));
             }
         });
+        llLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String latLong = lead.getProject().getLatLong();
+                if (TextUtils.isEmpty(latLong)) {
+                    CommonFunc.openUrl(view.getContext(), String.format(S.GMAP_SEARCH,
+                            tvProjectLocation.getText().toString()));
+                } else {
+                    String[] split = latLong.split(",");
+                    MapsActivity.show(view.getContext(), lead.getProject().getLocation(),
+                            "-6.2259813", "106.9988616", split[0], split[1]);
+                }
+            }
+        });
         if (getIntent().hasExtra(LEAD)) {
-            showHideProgressBar();
+//            showHideProgressBar();
             hideError();
             lead = app.getGson().fromJson(getIntent().getStringExtra(LEAD), Lead.class);
             if (lead != null) {
@@ -102,12 +118,6 @@ public class LeadDetailActivity extends BaseActivity {
             setError(getString(R.string.error_general), getString(R.string.error_general_content),
                     getString(R.string.try_again));
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        finish();
-        return true;
     }
 
     private void setData() {
@@ -129,9 +139,9 @@ public class LeadDetailActivity extends BaseActivity {
             ivWA.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (contact.startsWith("0")) {
-                        String countryCodeIndonesia = "+62" + contact.substring(1);
-                        CommonFunc.openUrl(view.getContext(), String.format(WA_LINK, countryCodeIndonesia));
+                    if (contact.startsWith(S.ZERO)) {
+                        String countryCodeIndonesia = S.CC_ID + contact.substring(1);
+                        CommonFunc.openUrl(view.getContext(), String.format(S.WA_LINK, countryCodeIndonesia));
                     }
                 }
             });

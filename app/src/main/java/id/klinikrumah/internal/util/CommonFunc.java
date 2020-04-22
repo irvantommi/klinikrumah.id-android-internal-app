@@ -2,6 +2,7 @@ package id.klinikrumah.internal.util;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
@@ -9,6 +10,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.text.Editable;
 import android.text.TextUtils;
+
+import androidx.core.content.ContextCompat;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -72,5 +75,14 @@ public class CommonFunc {
     @NotNull
     public static String setStringFromEditable(Editable input) {
         return input != null ? input.toString().trim() : "";
+    }
+
+    @NotNull
+    public static String setStringFromCharSequence(CharSequence input) {
+        return input != null ? input.toString().trim() : "";
+    }
+
+    public static boolean isGranted(Context context, String permission) {
+        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 }

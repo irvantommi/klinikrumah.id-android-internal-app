@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
@@ -26,8 +27,8 @@
                 android:id="@+id/et_client_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPersonName"
                 android:imeOptions="actionNext"
+                android:inputType="textPersonName"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -42,9 +43,47 @@
                 android:id="@+id/et_project_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPostalAddress"
-                android:imeOptions="actionNext" />
+                android:imeOptions="actionNext"
+                android:inputType="text" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginRight="4dp"
+                android:layout_marginEnd="4dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lat_long_desc" />
+
+                <TextView
+                    android:id="@+id/tv_lat_long"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_gravity="bottom"
+                    android:textColor="@android:color/black"
+                    tools:text="-6.2871979,107.0248579" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_lat_long"
+                style="@style/KRButton.Active"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="normal"
+                android:textSize="12sp"
+                android:text="@string/btn_lat_long" />
+        </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -73,8 +112,8 @@
                 android:id="@+id/et_project_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"
                 android:imeOptions="actionNext"
+                android:inputType="text"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -110,8 +149,8 @@
                         android:id="@+id/et_survey"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textAutoComplete"
                         android:imeOptions="actionNext"
+                        android:inputType="textAutoComplete"
                         android:maxLines="1" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -126,8 +165,8 @@
                         android:id="@+id/et_point_to_discuss"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textAutoComplete"
                         android:imeOptions="actionNext"
+                        android:inputType="textAutoComplete"
                         android:maxLines="1" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -157,9 +196,9 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_offering"
                         android:layout_width="match_parent"
-                        android:inputType="textAutoComplete"
                         android:layout_height="wrap_content"
                         android:imeOptions="actionNext"
+                        android:inputType="textAutoComplete"
                         android:maxLines="1" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
@@ -207,9 +246,9 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_size_building"
                 android:layout_width="match_parent"
-                android:inputType="textAutoComplete"
                 android:layout_height="wrap_content"
                 android:imeOptions="actionNext"
+                android:inputType="textAutoComplete"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -223,9 +262,9 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_size_land"
                 android:layout_width="match_parent"
-                android:inputType="textAutoComplete"
                 android:layout_height="wrap_content"
                 android:imeOptions="actionNext"
+                android:inputType="textAutoComplete"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 

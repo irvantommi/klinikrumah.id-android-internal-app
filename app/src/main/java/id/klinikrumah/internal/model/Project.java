@@ -11,6 +11,9 @@ public class Project extends BaseModel {
     @SerializedName("location")
     private String location;
 
+    @SerializedName("lat_long")
+    private String latLong;
+
     @SerializedName("size_building")
     private String sizeBuilding;
 
@@ -43,6 +46,14 @@ public class Project extends BaseModel {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getLatLong() {
+        return latLong;
+    }
+
+    public void setLatLong(String latLong) {
+        this.latLong = latLong;
     }
 
     public String getSizeBuilding() {
