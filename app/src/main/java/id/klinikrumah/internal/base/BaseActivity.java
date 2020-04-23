@@ -19,6 +19,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.Gson;
+
 import de.greenrobot.event.EventBus;
 import id.klinikrumah.internal.App;
 import id.klinikrumah.internal.R;
@@ -30,6 +32,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     // other class
     protected App app = App.getInstance();
     protected ApiInterface api;
+    protected Gson gson;
     protected EventBus eventBus;
     // from xml
     private FrameLayout flContainer;
@@ -45,6 +48,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         api = ApiClient.getRetrofit().create(ApiInterface.class);
+        gson = app.getGson();
         eventBus = app.getEventBus();
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);

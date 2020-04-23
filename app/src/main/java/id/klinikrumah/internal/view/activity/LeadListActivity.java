@@ -25,12 +25,12 @@ import java.util.List;
 import id.klinikrumah.internal.R;
 import id.klinikrumah.internal.base.BaseActivity;
 import id.klinikrumah.internal.model.Lead;
-import id.klinikrumah.internal.view.adapter.LeadListAdapter;
+import id.klinikrumah.internal.view.adapter.LeadAdapter;
 
 public class LeadListActivity extends BaseActivity {
     private static final String LEAD_LIST = "lead_list";
     // other class
-    private LeadListAdapter adapter;
+    private LeadAdapter adapter = new LeadAdapter();
     // from xml
 
     // member var
@@ -61,7 +61,7 @@ public class LeadListActivity extends BaseActivity {
         if (getIntent().hasExtra(LEAD_LIST)) {
 //            showHideProgressBar();
             hideError();
-            leadList = Arrays.asList(app.getGson().fromJson(getIntent().getStringExtra(LEAD_LIST),
+            leadList = Arrays.asList(gson.fromJson(getIntent().getStringExtra(LEAD_LIST),
                     Lead[].class));
         } else {
             setError(getString(R.string.data_not_found), getString(R.string.data_not_found_content),
@@ -74,14 +74,13 @@ public class LeadListActivity extends BaseActivity {
                 startActivity(new Intent(LeadListActivity.this, LeadActivity.class));
             }
         });
-        adapter = new LeadListAdapter(new ArrayList<Lead>());
-        adapter.setTaskListener(new LeadListAdapter.TaskListener() {
+        adapter.setTaskListener(new LeadAdapter.TaskListener() {
             @Override
             public void selectLead(Lead lead) {
-                LeadDetailActivity.show(LeadListActivity.this, app.getGson().toJson(lead));
+                LeadDetailActivity.show(LeadListActivity.this, gson.toJson(lead));
             }
         });
-        RecyclerView rvLeadList = findViewById(R.id.rv_lead_list);
+        RecyclerView rvLeadList = findViewById(R.id.rv_lead);
         rvLeadList.setAdapter(adapter);
         rvLeadList.setLayoutManager(new LinearLayoutManager(this));
 

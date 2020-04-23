@@ -2,6 +2,8 @@ package id.klinikrumah.internal.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 import id.klinikrumah.internal.base.BaseModel;
 
 public class Client extends BaseModel {
@@ -9,7 +11,7 @@ public class Client extends BaseModel {
     private String address;
 
     @SerializedName("contact")
-    private String contact;
+    private List<String> contactList;
 
     public String getAddress() {
         return address;
@@ -19,11 +21,11 @@ public class Client extends BaseModel {
         this.address = address;
     }
 
-    public String getContact() {
-        return contact;
+    public List<String> getContactList() {
+        return contactList;
     }
 
-    public void setContact(String contact) {
-        this.contact = contact;
+    public void setContactList(List<String> contactList) {
+        this.contactList = contactList;
     }
 }

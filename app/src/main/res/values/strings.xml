@@ -7,7 +7,7 @@
     <string name="name">Nama</string>
     <string name="location">Lokasi</string>
     <string name="lat_long_desc">LatLong, untuk dibuka di Google Maps</string>
-    <string name="btn_lat_long">Dapatkan\nLatLong</string>
+    <string name="btn_lat_long">Set LatLong</string>
     <string name="project">Proyek</string>
     <string name="action">Aksi</string>
     <string name="survey">Survei</string>
@@ -33,4 +33,6 @@
     <string name="cancel">Batalkan</string>
     <string name="search">Cari</string>
     <string name="title_activity_maps">Map</string>
+    <string name="add">+</string>
+    <string name="remove">x</string>
 </resources>

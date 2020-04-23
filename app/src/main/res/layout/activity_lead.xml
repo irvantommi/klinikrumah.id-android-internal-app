@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -50,11 +50,13 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="8dp">
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_marginRight="4dp"
                 android:layout_marginEnd="4dp"
@@ -63,14 +65,14 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textSize="12sp"
                     android:text="@string/lat_long_desc" />
 
                 <TextView
                     android:id="@+id/tv_lat_long"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:layout_gravity="bottom"
+                    android:layout_height="match_parent"
+                    android:gravity="bottom"
                     android:textColor="@android:color/black"
                     tools:text="-6.2871979,107.0248579" />
             </LinearLayout>
@@ -79,27 +81,20 @@
                 android:id="@+id/btn_lat_long"
                 style="@style/KRButton.Active"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
                 android:textStyle="normal"
                 android:textSize="12sp"
                 android:text="@string/btn_lat_long" />
         </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_contact"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="@string/contact">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_contact"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:imeOptions="actionNext"
-                android:inputType="phone"
-                android:maxLines="1" />
-        </com.google.android.material.textfield.TextInputLayout>
+            android:layout_marginTop="4dp"
+            tools:itemCount="2"
+            tools:listitem="@layout/item_contact"/>
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -325,4 +320,4 @@
                 android:text="@string/submit" />
         </LinearLayout>
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

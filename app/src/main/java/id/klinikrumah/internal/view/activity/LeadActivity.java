@@ -21,6 +21,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -53,6 +55,7 @@ import id.klinikrumah.internal.model.Client;
 import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.Project;
 import id.klinikrumah.internal.util.CommonFunc;
+import id.klinikrumah.internal.view.adapter.ContactAdapter;
 
 public class LeadActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks {
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
@@ -62,12 +65,11 @@ public class LeadActivity extends BaseActivity implements GoogleApiClient.Connec
     private static final int FASTEST_INTERVAL = 5000;
     private static final String LEAD = "lead";
     // other class
-
+    private ContactAdapter contactAdapter = new ContactAdapter();
     // from xml
     private TextInputEditText etClientName;
     private TextInputEditText etProjectLocation;
     private TextView tvLatLong;
-    private TextInputEditText etContact;
     private TextInputEditText etProjectName;
     private TextInputEditText etSurvey;
     private TextInputEditText etPointToDiscuss;
@@ -81,10 +83,10 @@ public class LeadActivity extends BaseActivity implements GoogleApiClient.Connec
     private TextInputEditText etTodo;
     // member var
     private Lead lead = new Lead();
-    private Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
     private boolean isUpdate = false;
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
+    private Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
 
     public static void show(Context context, String lead) {
         Intent intent = new Intent(context, LeadActivity.class);
@@ -104,7 +106,7 @@ public class LeadActivity extends BaseActivity implements GoogleApiClient.Connec
         etProjectLocation = findViewById(R.id.et_project_location);
         tvLatLong = findViewById(R.id.tv_lat_long);
         Button btnLatLong = findViewById(R.id.btn_lat_long);
-        etContact = findViewById(R.id.et_contact);
+        RecyclerView rvContact = findViewById(R.id.rv_contact);
         etProjectName = findViewById(R.id.et_project_name);
         etSurvey = findViewById(R.id.et_survey);
         etPointToDiscuss = findViewById(R.id.et_point_to_discuss);
@@ -123,6 +125,9 @@ public class LeadActivity extends BaseActivity implements GoogleApiClient.Connec
                 checkPermission();
             }
         });
+        rvContact.setAdapter(contactAdapter);
+        rvContact.setLayoutManager(new LinearLayoutManager(this));
+        rvContact.setNestedScrollingEnabled(false);
         final DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
@@ -167,13 +172,13 @@ public class LeadActivity extends BaseActivity implements GoogleApiClient.Connec
             public void onClick(View view) {
                 finish();
                 submitData(isUpdate);
-                LeadDetailActivity.show(LeadActivity.this, app.getGson().toJson(lead));
+                LeadDetailActivity.show(LeadActivity.this, gson.toJson(lead));
             }
         });
         if (getIntent().hasExtra(LEAD)) {
 //            showHideProgressBar();
             hideError();
-            lead = app.getGson().fromJson(getIntent().getStringExtra(LEAD), Lead.class);
+            lead = gson.fromJson(getIntent().getStringExtra(LEAD), Lead.class);
             if (lead != null) {
                 setData();
             }
@@ -308,7 +313,7 @@ public class LeadActivity extends BaseActivity implements GoogleApiClient.Connec
         Client client = lead.getClient();
         if (client != null) {
             etClientName.setText(client.getName());
-            etContact.setText(client.getContact());
+            contactAdapter.addAll(client.getContactList());
         }
         Project project = lead.getProject();
         if (project != null) {
@@ -336,7 +341,7 @@ public class LeadActivity extends BaseActivity implements GoogleApiClient.Connec
         Client client = isUpdate ? lead.getClient() : new Client();
         if (client != null) {
             client.setName(setString(etClientName.getText()));
-            client.setContact(setString(etContact.getText()));
+            client.setContactList(contactAdapter.getContactList());
         }
         lead.setClient(client);
 

@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import id.klinikrumah.internal.R;
@@ -15,12 +16,12 @@ import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.Project;
 import id.klinikrumah.internal.util.CommonFunc;
 
-public class LeadListAdapter extends RecyclerView.Adapter<LeadListAdapter.ViewHolder> {
+public class LeadAdapter extends RecyclerView.Adapter<LeadAdapter.ViewHolder> {
     private List<Lead> leadList;
     private TaskListener listener;
 
-    public LeadListAdapter(List<Lead> cityList) {
-        this.leadList = cityList;
+    public LeadAdapter() {
+        this.leadList = new ArrayList<>();
     }
 
     public void setTaskListener(TaskListener listener) {
@@ -75,12 +76,12 @@ public class LeadListAdapter extends RecyclerView.Adapter<LeadListAdapter.ViewHo
         TextView tvProjectLocation;
         TextView tvClientName;
 
-        ViewHolder(View view) {
-            super(view);
-            tvLeadNo = view.findViewById(R.id.tv_lead_no);
-            tvProjectName = view.findViewById(R.id.tv_project_name);
-            tvProjectLocation = view.findViewById(R.id.tv_project_location);
-            tvClientName = view.findViewById(R.id.tv_client_name);
+        ViewHolder(View v) {
+            super(v);
+            tvLeadNo = v.findViewById(R.id.tv_lead_no);
+            tvProjectName = v.findViewById(R.id.tv_project_name);
+            tvProjectLocation = v.findViewById(R.id.tv_project_location);
+            tvClientName = v.findViewById(R.id.tv_client_name);
         }
     }
 }

@@ -3,4 +3,6 @@
     <color name="colorPrimary">#FFFFFF</color>
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#FFFF00</color>
+    <!-- from https://www.colorhexa.com -->
+    <color name="red">#FF0000</color>
 </resources>

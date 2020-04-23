@@ -7,7 +7,7 @@
     android:paddingStart="16dp"
     android:paddingEnd="16dp">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="none">
@@ -64,6 +64,7 @@
                 </LinearLayout>
 
                 <ImageView
+                    android:id="@+id/iv_to_maps"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -71,50 +72,19 @@
                     android:src="@drawable/ic_chevron_right_black_24dp" />
             </LinearLayout>
 
-            <LinearLayout
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/contact"
+                android:layout_marginTop="8dp"
+                android:textSize="12sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_contact"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/contact"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/tv_contact"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:textColor="@android:color/black"
-                        android:textSize="16sp"
-                        tools:text="087 888 0211 63" />
-                </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/iv_dial"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/app_name"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_call_black_24dp" />
-
-                <ImageView
-                    android:id="@+id/iv_wa"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:contentDescription="@string/app_name"
-                    android:src="@drawable/ic_whatsapp_24dp" />
-            </LinearLayout>
+                tools:itemCount="2"
+                tools:listitem="@layout/item_contact_detail" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -314,7 +284,7 @@
                 android:textSize="16sp"
                 tools:text="Keterangan" />
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_edit"
