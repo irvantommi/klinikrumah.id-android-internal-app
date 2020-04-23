@@ -1,5 +1,7 @@
 package id.klinikrumah.internal.view.adapter;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,30 +36,28 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        // pass MyCustomEditTextListener to viewholder in onCreateViewHolder
+        // so that we don't have to do this expensive allocation in onBindViewHolder
         return new ViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.
-                item_contact, viewGroup, false));
+                item_contact, viewGroup, false), new CustomEditTextListener());
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int i) {
         final String contact = contactList.get(i);
+        holder.customEditTextListener.updatePosition(i);
         holder.tilContact.setHint(String.format("Kontak %s", i+1));
         holder.etContact.setText(contact);
-//        holder.etContact.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View view, boolean b) {
-//                contactList.set(i, contact);
-//            }
-//        });
+        boolean isFirstItem = i == 0;
+        if (!isFirstItem && contactList.size() == i+1) holder.etContact.requestFocus(); // last kontak getFocus
+        holder.btnAdd.setVisibility(isFirstItem ? View.VISIBLE : View.GONE);
         holder.btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 add();
             }
         });
-        if (i == 0) {
-            holder.btnRemove.setVisibility(View.GONE);
-        }
+        holder.btnRemove.setVisibility(isFirstItem ? View.GONE : View.VISIBLE);
         holder.btnRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,6 +95,32 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         return contactList;
     }
 
+    // we make TextWatcher to be aware of the position it currently works with
+    // this way, once a new item is attached in onBindViewHolder, it will
+    // update current position MyCustomEditTextListener, reference to which is kept by ViewHolder
+    private class CustomEditTextListener implements TextWatcher {
+        private int position;
+
+        public void updatePosition(int position) {
+            this.position = position;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            // no op
+        }
+
+        @Override
+        public void onTextChanged(@NotNull CharSequence charSequence, int i, int i2, int i3) {
+            contactList.set(position, charSequence.toString());
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            // no op
+        }
+    }
+
     //    public interface TaskListener {
 //        void add();
 //    }
@@ -102,13 +130,17 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         TextInputEditText etContact;
         Button btnAdd;
         Button btnRemove;
+        CustomEditTextListener customEditTextListener;
 
-        ViewHolder(View v) {
+        ViewHolder(View v, CustomEditTextListener customEditTextListener) {
             super(v);
             tilContact = v.findViewById(R.id.til_contact);
             etContact = v.findViewById(R.id.et_contact);
             btnAdd = v.findViewById(R.id.btn_add);
             btnRemove = v.findViewById(R.id.btn_remove);
+
+            this.customEditTextListener = customEditTextListener;
+            etContact.addTextChangedListener(this.customEditTextListener);
         }
     }
 }

@@ -185,12 +185,11 @@ public class LeadActivity extends BaseActivity implements GoogleApiClient.Connec
             isUpdate = true;
         } else {
             isUpdate = false;
-//            setError(getString(R.string.error_general), getString(R.string.error_general_content),
-//                    getString(R.string.try_again));
         }
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(String.format("%s Leads", isUpdate ? "Perbarui" : "Buat"));
         }
+        etClientName.requestFocus(); // to remove focus contactAdapter, first time loading only
         // setLocationRequest
         locationRequest = new LocationRequest();
         locationRequest.setInterval(INTERVAL);

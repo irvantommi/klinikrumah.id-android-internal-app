@@ -24,6 +24,7 @@ import id.klinikrumah.internal.model.Client;
 import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.Project;
 import id.klinikrumah.internal.util.CommonFunc;
+import id.klinikrumah.internal.util.ErrorType;
 import id.klinikrumah.internal.view.adapter.ContactDetailAdapter;
 
 public class LeadDetailActivity extends BaseActivity {
@@ -114,8 +115,7 @@ public class LeadDetailActivity extends BaseActivity {
                 setData();
             }
         } else {
-            setError(getString(R.string.error_general), getString(R.string.error_general_content),
-                    getString(R.string.try_again));
+            setError(ErrorType.GENERAL);
         }
     }
 

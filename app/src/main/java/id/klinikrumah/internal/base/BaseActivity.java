@@ -20,13 +20,21 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 import de.greenrobot.event.EventBus;
 import id.klinikrumah.internal.App;
 import id.klinikrumah.internal.R;
+import id.klinikrumah.internal.constant.S;
 import id.klinikrumah.internal.rest.ApiClient;
 import id.klinikrumah.internal.rest.ApiInterface;
 import id.klinikrumah.internal.util.CommonFunc;
+import id.klinikrumah.internal.util.ErrorType;
+import retrofit2.Response;
 
 public abstract class BaseActivity extends AppCompatActivity {
     // other class
@@ -84,6 +92,28 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected void showHideProgressBar() {
         pbBase.setVisibility(pbBase.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+    }
+
+    protected JsonObject processResponse(@NotNull Response<List<JsonObject>> response) {
+        JsonObject obj = response.body().get(0);
+        if (obj.has(S.RSPNS_STATUS)) {
+            if (S.RSPNS_SUCCESS.equals(obj.get(S.RSPNS_STATUS).getAsString())) {
+                if (obj.has(S.RSPNS_DATA)) {
+                    return obj.getAsJsonObject(S.RSPNS_DATA);
+                }
+            }
+        }
+        return null;
+    }
+
+    protected void setError(@NotNull ErrorType type) {
+        if (type.equals(ErrorType.GENERAL)) {
+            setError(getString(R.string.error_general), getString(R.string.error_general_content),
+                    getString(R.string.try_again));
+        } else if (type.equals(ErrorType.NOT_FOUND)) {
+            setError(getString(R.string.data_not_found), getString(R.string.data_not_found_content),
+                    getString(R.string.create_new));
+        }
     }
 
     protected void setError(String title, String content, String btnText) {

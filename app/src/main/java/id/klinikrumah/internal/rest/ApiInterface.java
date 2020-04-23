@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 
 import java.util.List;
 
-import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.User;
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -15,8 +14,8 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 
 public interface ApiInterface {
-    @GET("lead_list")
-    Call<List<Lead>> getLeadList();
+    @GET("test/klinikRumah")
+    Call<List<JsonObject>> getLeadList();
 
     // template
     @GET("login")

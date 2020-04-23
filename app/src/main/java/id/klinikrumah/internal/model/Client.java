@@ -10,7 +10,7 @@ public class Client extends BaseModel {
     @SerializedName("address")
     private String address;
 
-    @SerializedName("contact")
+    @SerializedName("contact_list")
     private List<String> contactList;
 
     public String getAddress() {
