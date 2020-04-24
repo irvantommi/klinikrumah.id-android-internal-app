@@ -2,41 +2,39 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:layout_marginTop="4dp">
+    android:layout_marginTop="@dimen/spc_child"
+    android:gravity="center_vertical">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_contact"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        style="@style/KRTextInputLayout"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
         android:layout_weight="1"
         android:hint="@string/contact">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_contact"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="phone"
-            android:maxLines="1" />
+            style="@style/KRTextInputEditText"
+            android:inputType="phone" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/btn_add"
         style="@style/KRButton.Active"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginLeft="4dp"
+        android:layout_width="@dimen/ic_small"
+        android:layout_height="@dimen/ic_small"
+        android:layout_marginStart="@dimen/spc_content"
+        android:layout_marginLeft="@dimen/spc_content"
         android:text="@string/add" />
 
     <Button
         android:id="@+id/btn_remove"
         style="@style/KRButton.Inactive"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginLeft="4dp"
+        android:layout_width="@dimen/ic_small"
+        android:layout_height="@dimen/ic_small"
+        android:layout_marginStart="@dimen/spc_content"
+        android:layout_marginLeft="@dimen/spc_content"
         android:background="@color/red"
         android:text="@string/remove" />
 </LinearLayout>

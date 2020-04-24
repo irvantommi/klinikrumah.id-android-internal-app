@@ -38,9 +38,10 @@ public class LeadListActivity extends BaseActivity {
     // other class
     private LeadAdapter adapter = new LeadAdapter();
     // from xml
-
+    FloatingActionButton fabNew;
     // member var
     private List<Lead> leadList = new ArrayList<>();
+    private ErrorType errorType;
 
     public static void show(Context context) {
         Intent intent = new Intent(context, LeadListActivity.class);
@@ -67,11 +68,24 @@ public class LeadListActivity extends BaseActivity {
         setContentView(R.layout.activity_lead_list);
 
         handleIntent(getIntent());
-        FloatingActionButton fabEdit = findViewById(R.id.fab_new);
-        fabEdit.setOnClickListener(new View.OnClickListener() {
+        fabNew = findViewById(R.id.fab_new);
+        fabNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(LeadListActivity.this, LeadActivity.class));
+                createLead();
+            }
+        });
+        setBtnBaseClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switch (errorType) {
+                    case GENERAL:
+                        getData();
+                        break;
+                    case NOT_FOUND:
+                        createLead();
+                        break;
+                }
             }
         });
         adapter.setTaskListener(new LeadAdapter.TaskListener() {
@@ -99,6 +113,9 @@ public class LeadListActivity extends BaseActivity {
     }
 
     private void getData() {
+        hideError();
+        showHideProgressBar();
+        fabNew.setVisibility(View.GONE);
         Call<List<JsonObject>> leadListCall = api.getLeadList();
         leadListCall.enqueue(new Callback<List<JsonObject>>() {
             @Override
@@ -107,17 +124,27 @@ public class LeadListActivity extends BaseActivity {
                 if (data != null && data.has(LEAD_LIST)) {
                     leadList = Arrays.asList(gson.fromJson(data.getAsJsonArray(LEAD_LIST).toString(),
                             Lead[].class));
-                    hideError();
                     adapter.addAll(leadList);
+                    fabNew.setVisibility(View.VISIBLE);
+                } else {
+                    errorType = ErrorType.NOT_FOUND;
+                    setError(errorType);
                 }
+                showHideProgressBar();
             }
 
             @Override
             public void onFailure(Call<List<JsonObject>> call, Throwable t) {
                 Log.e("Retrofit Get", t.toString());
-                setError(ErrorType.NOT_FOUND);
+                errorType = ErrorType.GENERAL;
+                setError(errorType);
+                showHideProgressBar();
             }
         });
+    }
+
+    private void createLead() {
+        startActivity(new Intent(this, LeadActivity.class));
     }
 
     private void handleIntent(@NotNull Intent intent) {

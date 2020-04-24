@@ -98,31 +98,38 @@ public abstract class BaseActivity extends AppCompatActivity {
         JsonObject obj = response.body().get(0);
         if (obj.has(S.RSPNS_STATUS)) {
             if (S.RSPNS_SUCCESS.equals(obj.get(S.RSPNS_STATUS).getAsString())) {
-                if (obj.has(S.RSPNS_DATA)) {
-                    return obj.getAsJsonObject(S.RSPNS_DATA);
-                }
+                return obj.has(S.RSPNS_DATA) ? obj.getAsJsonObject(S.RSPNS_DATA) : new JsonObject();
             }
         }
         return null;
     }
 
     protected void setError(@NotNull ErrorType type) {
-        if (type.equals(ErrorType.GENERAL)) {
-            setError(getString(R.string.error_general), getString(R.string.error_general_content),
-                    getString(R.string.try_again));
-        } else if (type.equals(ErrorType.NOT_FOUND)) {
-            setError(getString(R.string.data_not_found), getString(R.string.data_not_found_content),
-                    getString(R.string.create_new));
+        switch (type) {
+            case GENERAL:
+                setError(0, getString(R.string.error_general),
+                        getString(R.string.error_general_content), getString(R.string.try_again));
+                break;
+            case NOT_FOUND:
+                setError(0, getString(R.string.data_not_found),
+                        getString(R.string.data_not_found_content), getString(R.string.create_new));
+                break;
         }
     }
 
-    protected void setError(String title, String content, String btnText) {
+    protected void setError(int resId, String title, String content, String btnText) {
         flContainer.setVisibility(View.GONE);
         llError.setVisibility(View.VISIBLE);
-        ivBaseIcon.setVisibility(View.VISIBLE);
+        if (resId != 0) {
+            ivBaseIcon.setBackground(getResources().getDrawable(resId));
+        }
         tvBaseTitle.setText(title);
         tvBaseContent.setText(content);
         btnBase.setText(btnText);
+    }
+
+    protected void setBtnBaseClickListener(View.OnClickListener listener) {
+        btnBase.setOnClickListener(listener);
     }
 
     protected void hideError() {

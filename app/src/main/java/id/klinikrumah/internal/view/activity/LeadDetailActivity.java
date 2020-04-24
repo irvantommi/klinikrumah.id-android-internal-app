@@ -94,13 +94,13 @@ public class LeadDetailActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 String latLong = lead.getProject().getLatLong();
-                if (TextUtils.isEmpty(latLong)) {
-                    CommonFunc.openUrl(view.getContext(), String.format(S.GMAP_SEARCH,
-                            tvProjectLocation.getText().toString()));
-                } else {
+                if (!TextUtils.isEmpty(latLong)) {
                     String[] split = latLong.split(",");
                     MapsActivity.show(view.getContext(), lead.getProject().getLocation(),
                             "-6.2259813", "106.9988616", split[0], split[1]);
+                } else {
+                    CommonFunc.openUrl(view.getContext(), String.format(S.GMAP_SEARCH,
+                            tvProjectLocation.getText().toString()));
                 }
             }
         });
