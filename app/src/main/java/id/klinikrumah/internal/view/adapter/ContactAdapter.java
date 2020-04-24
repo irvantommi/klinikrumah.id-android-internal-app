@@ -1,6 +1,7 @@
 package id.klinikrumah.internal.view.adapter;
 
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import id.klinikrumah.internal.R;
@@ -49,7 +51,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         holder.tilContact.setHint(String.format("Kontak %s", i+1));
         holder.etContact.setText(contact);
         boolean isFirstItem = i == 0;
-        if (!isFirstItem && contactList.size() == i+1) holder.etContact.requestFocus(); // last kontak getFocus
+        if (!isFirstItem && contactList.size() == i+1) holder.etContact.requestFocus(); // last contact but not only one, getFocus
         holder.btnAdd.setVisibility(isFirstItem ? View.VISIBLE : View.GONE);
         holder.btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,8 +83,15 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         notifyDataSetChanged();
     }
 
-    public void addAll(List<String> contactList) {
+    public void addAll(@NotNull List<String> contactList) {
         this.contactList.addAll(contactList);
+        // if edit, remove empty
+        for (Iterator<String> iterator = this.contactList.iterator(); iterator.hasNext(); ) {
+            String value = iterator.next();
+            if (TextUtils.isEmpty(value)) {
+                iterator.remove();
+            }
+        }
         notifyDataSetChanged();
     }
 

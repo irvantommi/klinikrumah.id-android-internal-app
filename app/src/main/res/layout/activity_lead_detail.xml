@@ -16,25 +16,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="@dimen/spc_child"
+            android:paddingTop="@dimen/spc_parent"
             android:paddingBottom="64dp">
 
             <TextView
                 style="@style/KRTextView"
-                android:layout_marginTop="@dimen/spc_child"
                 android:text="@string/name" />
 
             <TextView
                 android:id="@+id/tv_client_name"
                 style="@style/KRTextView.Black"
-                android:layout_marginTop="@dimen/spc_item"
                 tools:text="Prof. Dr. Muhammad Irvan Tommi, Lc hafizhohullah ta'ala" />
 
             <LinearLayout
                 android:id="@+id/ll_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spc_child">
+                android:layout_marginTop="@dimen/spc_content">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -49,7 +47,6 @@
                     <TextView
                         android:id="@+id/tv_project_location"
                         style="@style/KRTextView.Black"
-                        android:layout_marginTop="@dimen/spc_item"
                         tools:text="Jannatul Firdaus" />
                 </LinearLayout>
 
@@ -64,7 +61,7 @@
 
             <TextView
                 style="@style/KRTextView"
-                android:layout_marginTop="@dimen/spc_child"
+                android:layout_marginTop="@dimen/spc_content"
                 android:text="@string/contact" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -76,23 +73,23 @@
 
             <TextView
                 style="@style/KRTextView"
-                android:layout_marginTop="@dimen/spc_child"
+                android:layout_marginTop="@dimen/spc_content"
                 android:text="@string/project" />
 
             <TextView
                 android:id="@+id/tv_project_name"
                 style="@style/KRTextView.Black"
-                android:layout_marginTop="@dimen/spc_item"
                 tools:text="Membangun Istana" />
 
             <TextView
                 style="@style/KRTextView"
-                android:layout_marginTop="@dimen/spc_child"
+                android:layout_marginTop="@dimen/spc_content"
                 android:text="@string/action" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spc_item">
 
                 <View
                     android:layout_width="1dp"
@@ -103,6 +100,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spc_content"
+                    android:layout_marginLeft="@dimen/spc_content"
                     android:orientation="vertical">
 
                     <TextView
@@ -112,108 +111,98 @@
                     <TextView
                         android:id="@+id/tv_survey"
                         style="@style/KRTextView.Black"
-                        android:layout_marginTop="@dimen/spc_item"
                         tools:text="Belum" />
 
                     <TextView
                         style="@style/KRTextView"
-                        android:layout_marginTop="@dimen/spc_child"
+                        android:layout_marginTop="@dimen/spc_content"
                         android:text="@string/point_to_discuss" />
 
                     <TextView
                         android:id="@+id/tv_point_to_discuss"
                         style="@style/KRTextView.Black"
-                        android:layout_marginTop="@dimen/spc_item"
                         tools:text="-" />
 
                     <TextView
                         style="@style/KRTextView"
-                        android:layout_marginTop="@dimen/spc_child"
+                        android:layout_marginTop="@dimen/spc_content"
                         android:text="@string/draft_design" />
 
                     <TextView
                         android:id="@+id/tv_draft_design"
                         style="@style/KRTextView.Black"
-                        android:layout_marginTop="@dimen/spc_item"
                         tools:text="Denah Istana Sudah Diberikan" />
 
                     <TextView
                         style="@style/KRTextView"
-                        android:layout_marginTop="@dimen/spc_child"
+                        android:layout_marginTop="@dimen/spc_content"
                         android:text="@string/offering" />
 
                     <TextView
                         android:id="@+id/tv_offering"
                         style="@style/KRTextView.Black"
-                        android:layout_marginTop="@dimen/spc_item"
                         tools:text="-" />
                 </LinearLayout>
             </LinearLayout>
 
             <TextView
                 style="@style/KRTextView"
-                android:layout_marginTop="@dimen/spc_child"
+                android:layout_marginTop="@dimen/spc_content"
                 android:text="@string/description" />
 
             <TextView
                 android:id="@+id/tv_description"
                 style="@style/KRTextView.Black"
-                android:layout_marginTop="@dimen/spc_item"
                 tools:text="Minta Layout + Estimasi Harga" />
 
             <TextView
                 style="@style/KRTextView"
-                android:layout_marginTop="@dimen/spc_child"
+                android:layout_marginTop="@dimen/spc_content"
                 android:text="@string/budget" />
 
             <TextView
                 android:id="@+id/tv_budget"
                 style="@style/KRTextView.Black"
-                android:layout_marginTop="@dimen/spc_item"
                 tools:text="1 M" />
 
             <TextView
                 style="@style/KRTextView"
-                android:layout_marginTop="@dimen/spc_child"
+                android:layout_marginTop="@dimen/spc_content"
                 android:text="@string/size_building" />
 
             <TextView
                 android:id="@+id/tv_size_building"
                 style="@style/KRTextView.Black"
-                android:layout_marginTop="@dimen/spc_item"
                 tools:text="20 x 22,5 m2" />
 
             <TextView
                 style="@style/KRTextView"
-                android:layout_marginTop="@dimen/spc_child"
+                android:layout_marginTop="@dimen/spc_content"
                 android:text="@string/size_land" />
 
             <TextView
                 android:id="@+id/tv_size_land"
                 style="@style/KRTextView.Black"
-                android:layout_marginTop="@dimen/spc_item"
                 tools:text="750 m2" />
 
             <TextView
                 style="@style/KRTextView"
-                android:layout_marginTop="@dimen/spc_child"
+                android:layout_marginTop="@dimen/spc_content"
                 android:text="@string/date" />
 
             <TextView
                 android:id="@+id/tv_date"
                 style="@style/KRTextView.Black"
-                android:layout_marginTop="@dimen/spc_item"
                 tools:text="1 Ramadhan 1453 H" />
 
             <TextView
                 style="@style/KRTextView"
-                android:layout_marginTop="@dimen/spc_child"
+                android:layout_marginTop="@dimen/spc_content"
                 android:text="@string/todo" />
 
             <TextView
                 android:id="@+id/tv_todo"
                 style="@style/KRTextView.Black"
-                android:layout_marginTop="@dimen/spc_item"
                 tools:text="Keterangan" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

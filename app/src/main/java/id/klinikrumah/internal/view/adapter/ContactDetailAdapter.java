@@ -4,16 +4,14 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.textfield.TextInputEditText;
-
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import id.klinikrumah.internal.R;
@@ -24,15 +22,10 @@ import static id.klinikrumah.internal.util.CommonFunc.setDefaultIfEmpty;
 
 public class ContactDetailAdapter extends RecyclerView.Adapter<ContactDetailAdapter.ViewHolder> {
     private List<String> contactList;
-//    private TaskListener listener;
 
     public ContactDetailAdapter() {
         this.contactList = new ArrayList<>();
     }
-
-//    public void setTaskListener(TaskListener listener) {
-//        this.listener = listener;
-//    }
 
     @NonNull
     @Override
@@ -77,6 +70,13 @@ public class ContactDetailAdapter extends RecyclerView.Adapter<ContactDetailAdap
 
     public void addAll(List<String> contactList) {
         this.contactList.addAll(contactList);
+        // remove empty
+        for (Iterator<String> iterator = this.contactList.iterator(); iterator.hasNext(); ) {
+            String value = iterator.next();
+            if (TextUtils.isEmpty(value)) {
+                iterator.remove();
+            }
+        }
         notifyDataSetChanged();
     }
 
@@ -84,14 +84,6 @@ public class ContactDetailAdapter extends RecyclerView.Adapter<ContactDetailAdap
         contactList.clear();
         notifyDataSetChanged();
     }
-
-    public List<String> getContactList() {
-        return contactList;
-    }
-
-    //    public interface TaskListener {
-//        void add();
-//    }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvContact;

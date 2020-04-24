@@ -132,6 +132,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         btnBase.setOnClickListener(listener);
     }
 
+    protected void setContentVisibility(int i) {
+        flContainer.setVisibility(i);
+    }
+
     protected void hideError() {
         flContainer.setVisibility(View.VISIBLE);
         llError.setVisibility(View.GONE);
