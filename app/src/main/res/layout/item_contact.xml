@@ -26,7 +26,7 @@
         android:layout_height="@dimen/ic_small"
         android:layout_marginStart="@dimen/spc_content"
         android:layout_marginLeft="@dimen/spc_content"
-        android:text="@string/add" />
+        android:text="@string/plus" />
 
     <Button
         android:id="@+id/btn_remove"

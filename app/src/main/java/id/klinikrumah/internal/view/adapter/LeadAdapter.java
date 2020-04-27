@@ -1,8 +1,11 @@
 package id.klinikrumah.internal.view.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,17 +18,21 @@ import id.klinikrumah.internal.R;
 import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.Project;
 import id.klinikrumah.internal.util.CommonFunc;
+import id.klinikrumah.internal.util.ErrorType;
+import id.klinikrumah.internal.view.activity.LeadListActivity;
 
-public class LeadAdapter extends RecyclerView.Adapter<LeadAdapter.ViewHolder> {
-    private List<Lead> leadList;
+public class LeadAdapter extends RecyclerView.Adapter<LeadAdapter.ViewHolder> implements Filterable {
     private TaskListener listener;
+    private Context ctx;
+    private List<Lead> oriList = new ArrayList<>();
+    private List<Lead> filteredList = new ArrayList<>();
 
-    public LeadAdapter() {
-        this.leadList = new ArrayList<>();
+    public LeadAdapter(Context context) {
+        ctx = context;
     }
 
-    public void setTaskListener(TaskListener listener) {
-        this.listener = listener;
+    public void setTaskListener(TaskListener taskListener) {
+        listener = taskListener;
     }
 
     @NonNull
@@ -37,7 +44,7 @@ public class LeadAdapter extends RecyclerView.Adapter<LeadAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int i) {
-        final Lead lead = leadList.get(i);
+        final Lead lead = filteredList.get(i);
         Project project = lead.getProject();
         holder.tvLeadNo.setText(String.format("L%s", i + 1));
         holder.tvProjectName.setText(CommonFunc.setDefaultIfEmpty(project.getName()));
@@ -53,16 +60,72 @@ public class LeadAdapter extends RecyclerView.Adapter<LeadAdapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return leadList.size();
+        return filteredList.size();
+    }
+
+    /**
+     * https://stackoverflow.com/questions/14663725/list-view-filter-android
+     */
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                if (filteredList.isEmpty()) {
+                    if (((LeadListActivity) ctx).rvLeadList.getVisibility() == View.VISIBLE) {
+                        ((LeadListActivity) ctx).setError(ErrorType.NOT_FOUND);
+                    }
+                } else {
+                    ((LeadListActivity) ctx).hideError();
+                    notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                FilterResults results = new FilterResults();
+                filteredList.clear();
+                // perform your search here using the searchConstraint String.
+                String query = constraint.toString().toLowerCase();
+                for (int i = 0; i < oriList.size(); i++) {
+                    Lead lead = oriList.get(i);
+                    Project project = lead.getProject();
+                    if (project.getName().toLowerCase().contains(query)) {
+                        filteredList.add(lead);
+                    }
+                    if (project.getLocation().toLowerCase().contains(query)) {
+                        filteredList.add(lead);
+                    }
+                    if (lead.getClient().getName().toLowerCase().contains(query)) {
+                        filteredList.add(lead);
+                    }
+                }
+                results.count = filteredList.size();
+                results.values = filteredList;
+
+                return results;
+            }
+        };
+    }
+
+    public List<Lead> getOriList() {
+        return oriList;
     }
 
     public void clear() {
-        leadList.clear();
+        filteredList.clear();
         notifyDataSetChanged();
     }
 
     public void addAll(List<Lead> leadList) {
-        this.leadList.addAll(leadList);
+        oriList.addAll(leadList);
+        filteredList.addAll(leadList);
+        notifyDataSetChanged();
+    }
+
+    public void showAll() {
+        filteredList.clear();
+        filteredList.addAll(oriList);
         notifyDataSetChanged();
     }
 

@@ -3,6 +3,8 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="title_activity_maps">Peta</string>
+    <string name="title_activity_lead_list">Daftar Calon Klien</string>
     <!-- v1.0.0 -->
     <string name="name">Nama</string>
     <string name="location">Lokasi</string>
@@ -26,13 +28,13 @@
     <string name="try_again">Coba Lagi</string>
     <string name="data_not_found">Data tidak ditemukan</string>
     <string name="data_not_found_content">Silakan buat data baru dengan klik tombol</string>
-    <string name="create_new">Buat Baru</string>
+    <string name="create">Buat</string>
+    <string name="add">Tambah</string>
     <string name="edit">Ubah</string>
     <string name="submit">Kirim</string>
     <string name="update">Perbarui</string>
     <string name="cancel">Batalkan</string>
     <string name="search">Cari</string>
-    <string name="title_activity_maps">Map</string>
-    <string name="add">+</string>
+    <string name="plus">+</string>
     <string name="remove">x</string>
 </resources>

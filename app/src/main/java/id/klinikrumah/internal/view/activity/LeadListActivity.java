@@ -39,11 +39,13 @@ import retrofit2.Response;
 public class LeadListActivity extends BaseActivity {
     private static final String LEAD_LIST = "lead_list";
     // from xml
-    FloatingActionButton fabNew;
+    public RecyclerView rvLeadList;
+    private FloatingActionButton fabNew;
     // other class
-    private LeadAdapter adapter = new LeadAdapter();
+    private LeadAdapter adapter = new LeadAdapter(this);
     // member var
     private List<Lead> leadList = new ArrayList<>();
+    private boolean isFilter = false;
     private ErrorType errorType;
 
     public static void show(Context context) {
@@ -62,15 +64,46 @@ public class LeadListActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        getData();
+        getData(false);
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lead_list);
+        ivBack.setVisibility(View.GONE);
+        tvTitleToolbar.setText(getString(R.string.title_activity_lead_list));
+        ivSearch.setVisibility(View.VISIBLE);
 
         handleIntent(getIntent());
+        setSearchListener(new SearchListener() {
+            @Override
+            public void onSearchSubmit(String s) {
+                keyboardHide();
+                getData(true);
+            }
+
+            @Override
+            public void onSearchChange(String s) {
+                getData(true);
+            }
+
+            @Override
+            public void onSearchClear() {
+                getData(false);
+                adapter.showAll();
+            }
+        });
+        adapter.setTaskListener(new LeadAdapter.TaskListener() {
+            @Override
+            public void selectLead(Lead lead) {
+                LeadDetailActivity.show(LeadListActivity.this, gson.toJson(lead));
+            }
+        });
+        rvLeadList = findViewById(R.id.rv_lead);
+        rvLeadList.setAdapter(adapter);
+        rvLeadList.setLayoutManager(new LinearLayoutManager(this));
+
         fabNew = findViewById(R.id.fab_new);
         fabNew.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,7 +116,7 @@ public class LeadListActivity extends BaseActivity {
             public void onClick(View view) {
                 switch (errorType) {
                     case GENERAL:
-                        getData();
+                        getData(false);
                         break;
                     case NOT_FOUND:
                         createLead();
@@ -91,15 +124,6 @@ public class LeadListActivity extends BaseActivity {
                 }
             }
         });
-        adapter.setTaskListener(new LeadAdapter.TaskListener() {
-            @Override
-            public void selectLead(Lead lead) {
-                LeadDetailActivity.show(LeadListActivity.this, gson.toJson(lead));
-            }
-        });
-        RecyclerView rvLeadList = findViewById(R.id.rv_lead);
-        rvLeadList.setAdapter(adapter);
-        rvLeadList.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
@@ -115,42 +139,68 @@ public class LeadListActivity extends BaseActivity {
         return true;
     }
 
-    private void getData() {
-        hideError();
-        setContentVisibility(View.GONE);
-        fabNew.setVisibility(View.GONE);
-        showHideProgressBar();
-        Call<List<JsonObject>> leadListCall = api.getLeadList();
-        leadListCall.enqueue(new Callback<List<JsonObject>>() {
-            @Override
-            public void onResponse(Call<List<JsonObject>> call, Response<List<JsonObject>> response) {
-                JsonObject data = processResponse(response);
-                if (data != null && data.has(LEAD_LIST)) {
-                    leadList = Arrays.asList(gson.fromJson(data.getAsJsonArray(LEAD_LIST).toString(),
-                            Lead[].class));
+    @Override
+    public void onBackPressed() {
+        if (svBase.getVisibility() == View.GONE) {
+            super.onBackPressed();
+        } else {
+            setSearchIconified(true);
+            getData(false);
+            adapter.showAll();
+        }
+    }
+
+    private void getData(boolean isFilter) {
+        this.isFilter = isFilter;
+        if (adapter.getOriList().size() == 0) {
+            hideError();
+            setContentVisibility(View.GONE);
+            fabNew.setVisibility(View.GONE);
+            showHideProgressBar();
+            Call<List<JsonObject>> leadListCall = api.getLeadList();
+            leadListCall.enqueue(new Callback<List<JsonObject>>() {
+                @Override
+                public void onResponse(Call<List<JsonObject>> call, Response<List<JsonObject>> response) {
+                    JsonObject data = processResponse(response);
+                    if (data != null && data.has(LEAD_LIST)) {
+                        leadList = Arrays.asList(gson.fromJson(data.getAsJsonArray(LEAD_LIST).toString(),
+                                Lead[].class));
+                        adapter.addAll(leadList);
+                        setContentVisibility(View.VISIBLE);
+                        fabNew.setVisibility(View.VISIBLE);
+                    } else {
+                        errorType = ErrorType.NOT_FOUND;
+                        setError(errorType);
+                    }
+                    showHideProgressBar();
+                }
+
+                @Override
+                public void onFailure(Call<List<JsonObject>> call, Throwable t) {
+                    Log.e("Retrofit Get", t.toString());
+                    // temp
+                    leadList = getDummy();
                     adapter.addAll(leadList);
                     setContentVisibility(View.VISIBLE);
                     fabNew.setVisibility(View.VISIBLE);
-                } else {
-                    errorType = ErrorType.NOT_FOUND;
-                    setError(errorType);
-                }
-                showHideProgressBar();
-            }
-
-            @Override
-            public void onFailure(Call<List<JsonObject>> call, Throwable t) {
-                Log.e("Retrofit Get", t.toString());
-                // temp
-                leadList = getDummy();
-                adapter.addAll(leadList);
-                setContentVisibility(View.VISIBLE);
-                fabNew.setVisibility(View.VISIBLE);
 //                errorType = ErrorType.GENERAL;
 //                setError(errorType);
-                showHideProgressBar();
-            }
-        });
+                    showHideProgressBar();
+                }
+            });
+        } else if (isFilter) {
+            filter();
+        }
+    }
+
+    private void filter() {
+        String query = svBase.getQuery().toString().trim();
+        if (query.isEmpty()) {
+            adapter.showAll();
+            hideError();
+        } else {
+            adapter.getFilter().filter(query);
+        }
     }
 
     private void createLead() {

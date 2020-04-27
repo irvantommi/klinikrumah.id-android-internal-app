@@ -63,7 +63,9 @@ public class LeadActivity extends BaseActivity implements GoogleApiClient.Connec
     private static final int REQUEST_SETTING_RESULT = 3;
     private static final int INTERVAL = 10000;
     private static final int FASTEST_INTERVAL = 5000;
+    private static final String TITLE = "%s Calon Klien";
     private static final String LEAD = "lead";
+    private static final String DATE_FORMAT = "dd/MM/yy";
     // other class
     private ContactAdapter contactAdapter = new ContactAdapter();
     // from xml
@@ -135,8 +137,7 @@ public class LeadActivity extends BaseActivity implements GoogleApiClient.Connec
                 calendar.set(Calendar.MONTH, monthOfYear);
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-                etDate.setText(new SimpleDateFormat("dd/MM/yy", Locale.getDefault()).
-                        format(calendar.getTime()));
+                etDate.setText(new SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(calendar.getTime()));
             }
         };
         final DatePickerDialog datePickerDialog = new DatePickerDialog(LeadActivity.this,
@@ -186,9 +187,7 @@ public class LeadActivity extends BaseActivity implements GoogleApiClient.Connec
         } else {
             isUpdate = false;
         }
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(String.format("%s Leads", isUpdate ? "Perbarui" : "Buat"));
-        }
+        tvTitleToolbar.setText(String.format(TITLE, isUpdate ? getString(R.string.update) : getString(R.string.add)));
         etClientName.requestFocus(); // to remove focus contactAdapter, first time loading only
         // setLocationRequest
         locationRequest = new LocationRequest();

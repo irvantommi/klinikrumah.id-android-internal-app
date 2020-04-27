@@ -28,7 +28,7 @@ import id.klinikrumah.internal.util.ErrorType;
 import id.klinikrumah.internal.view.adapter.ContactDetailAdapter;
 
 public class LeadDetailActivity extends BaseActivity {
-    private static final String TITLE = "Leads Detail";
+    private static final String TITLE = "Detail Calon Klien";
     private static final String LEAD = "lead";
     // other class
     ContactDetailAdapter contactAdapter = new ContactDetailAdapter();
@@ -64,9 +64,8 @@ public class LeadDetailActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lead_detail);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(TITLE);
-        }
+        tvTitleToolbar.setText(TITLE);
+
         tvClientName = findViewById(R.id.tv_client_name);
         llLocation = findViewById(R.id.ll_location);
         tvProjectLocation = findViewById(R.id.tv_project_location);
