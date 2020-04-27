@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -27,5 +28,5 @@
         android:layout_marginStart="@dimen/spc_child"
         android:layout_marginLeft="@dimen/spc_child"
         android:contentDescription="@string/app_name"
-        android:src="@drawable/ic_whatsapp_24dp" />
+        app:srcCompat="@drawable/ic_whatsapp" />
 </LinearLayout>

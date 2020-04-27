@@ -1,7 +1,6 @@
 package id.klinikrumah.internal.base;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.MenuItem;
@@ -19,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -44,6 +44,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected Gson gson;
     protected EventBus eventBus;
     // from xml
+    protected AppBarLayout ablBase;
     protected ImageView ivBack;
     protected TextView tvTitleToolbar;
     protected ImageView ivSearch;
@@ -85,6 +86,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void setContentView(int layoutResID) {
         RelativeLayout rlBase = (RelativeLayout) getLayoutInflater().inflate(R.layout.activity_base,
                 null);
+        ablBase = rlBase.findViewById(R.id.abl_base);
         ivBack = rlBase.findViewById(R.id.iv_back);
         tvTitleToolbar = rlBase.findViewById(R.id.tv_title_toolbar);
         ivSearch = rlBase.findViewById(R.id.iv_search);

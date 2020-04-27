@@ -1,6 +1,8 @@
 package id.klinikrumah.internal.view.activity;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 
@@ -13,7 +15,13 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        ablBase.setVisibility(View.GONE);
 
-        LeadListActivity.show(this);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                LeadListActivity.show(SplashActivity.this);
+            }
+        }, 1000);
     }
 }
