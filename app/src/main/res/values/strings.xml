@@ -6,6 +6,16 @@
     <string name="title_activity_maps">Peta</string>
     <string name="title_activity_lead_list">Daftar Calon Klien</string>
     <!-- v1.0.0 -->
+    <string name="email">Email</string>
+    <string name="password">Kata Sandi</string>
+    <string name="forgot_password">Lupa Kata Sandi?</string>
+    <string name="enter">Masuk</string>
+    <string name="or">Atau</string>
+    <string name="login_by_phone">Masuk dengan Nomor Ponsel</string>
+    <string name="login_by_fb">Masuk dengan Facebook</string>
+    <string name="login_by_google">Masuk dengan Google</string>
+    <string name="login_message">Dengan Masuk, Anda menyetujui <b>Syarat &amp; Ketentuan</b> serta <b>Privasi</b> KlinikRumah.id</string>
+    <string name="dont_have_account_register">Belum punya akun? <b>Daftar</b></string>
     <string name="name">Nama</string>
     <string name="location">Lokasi</string>
     <string name="lat_long_desc">LatLong, untuk dibuka di Google Maps</string>

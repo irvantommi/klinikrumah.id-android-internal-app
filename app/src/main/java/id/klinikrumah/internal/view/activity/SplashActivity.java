@@ -20,7 +20,7 @@ public class SplashActivity extends BaseActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                LeadListActivity.show(SplashActivity.this);
+                LoginActivity.show(SplashActivity.this);
             }
         }, 1000);
     }
