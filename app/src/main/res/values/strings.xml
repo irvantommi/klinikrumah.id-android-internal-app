@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Internal Klinik Rumah</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
@@ -20,6 +19,7 @@
     <string name="location">Lokasi</string>
     <string name="lat_long_desc">LatLong, untuk dibuka di Google Maps</string>
     <string name="btn_lat_long">Set LatLong</string>
+    <string name="allow_location">Izinkan KlinikRumah mengakses lokasi Anda?</string>
     <string name="project">Proyek</string>
     <string name="action">Aksi</string>
     <string name="survey">Survei</string>
@@ -33,11 +33,12 @@
     <string name="date">Tanggal</string>
     <string name="todo">PR</string>
     <string name="contact">Kontak</string>
+
     <string name="error_general">Halaman Tidak Dapat Diakses</string>
     <string name="error_general_content">Mohon maaf, terjadi kesalahan. Silakan coba kembali</string>
-    <string name="try_again">Coba Lagi</string>
     <string name="data_not_found">Data tidak ditemukan</string>
     <string name="data_not_found_content">Silakan buat data baru dengan klik tombol</string>
+    <string name="try_again">Coba Lagi</string>
     <string name="create">Buat</string>
     <string name="add">Tambah</string>
     <string name="edit">Ubah</string>
@@ -47,4 +48,5 @@
     <string name="search">Cari</string>
     <string name="plus">+</string>
     <string name="remove">x</string>
+    <string name="allow">Izinkan</string>
 </resources>

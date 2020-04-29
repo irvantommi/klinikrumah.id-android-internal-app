@@ -5,11 +5,9 @@ import androidx.multidex.MultiDexApplication;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.util.Arrays;
-import java.util.List;
-
 import de.greenrobot.event.EventBus;
 import id.klinikrumah.internal.constant.Pref;
+import id.klinikrumah.internal.model.GoogleUserData;
 import id.klinikrumah.internal.util.SharedPref;
 
 public class App extends MultiDexApplication {
@@ -18,12 +16,12 @@ public class App extends MultiDexApplication {
     private EventBus eventBus;
     private Gson gson;
 
-    public static synchronized App getInstance() {
-        return instance;
-    }
-
     public App() {
         instance = this;
+    }
+
+    public static synchronized App getInstance() {
+        return instance;
     }
 
     @Override
@@ -45,12 +43,22 @@ public class App extends MultiDexApplication {
         return gson;
     }
 
-//    public List<Interest> getInterestList() {
-//        String json = SharedPref.getString(Pref.CACHE, this, BaseID.Preferences.CACHE_INTEREST_OBJECT);
-//        Interest[] objArray = getGson().fromJson(json, Interest[].class);
-//        return Arrays.asList(objArray);
-//    }
-//
+    public boolean isLogin() {
+        return SharedPref.getBoolean(Pref.CACHE_LOGIN);
+    }
+
+    public void setLogin(boolean isLogin) {
+        SharedPref.putBoolean(Pref.CACHE_LOGIN, isLogin);
+    }
+
+    public GoogleUserData getAccountGoogle() {
+        return gson.fromJson(SharedPref.getString(Pref.CACHE_ACCOUNT_GOOGLE), GoogleUserData.class);
+    }
+
+    public void setAccountGoogle(GoogleUserData userData) {
+        SharedPref.putString(Pref.CACHE_ACCOUNT_GOOGLE, gson.toJson(userData));
+    }
+
 //    public List<Interest> getUserInterestList() {
 //        String json = SharedPref.getString(Pref.CACHE, this, BaseID.Preferences.CACHE_USER_INTEREST_OBJECT);
 //        Interest[] objArray = getGson().fromJson(json, Interest[].class);

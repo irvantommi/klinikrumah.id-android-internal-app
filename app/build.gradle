@@ -9,18 +9,86 @@ android {
         minSdkVersion 16
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
+        multiDexEnabled true
+        archivesBaseName = "klinikrumah-internal-$versionName"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude("META-INF/*.kotlin_module")
+    }
+
     buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    flavorDimensions "default"
 
+    productFlavors {
+        development {
+            applicationId "id.klinikrumah.internal"
+            resValue "string", "version", "1.0.0"
+            resValue "string", "app_name", "Internal Klinik RUmah Development"
+            resValue "string", "server_client_id", "449506311554-cjplcvj5dkkvfins5nj14a9n9vki7uok.apps.googleusercontent.com"
+            buildConfigField "String", "HOST_PORT", KLINIKRUMAHID_HOST_PORT_DEV
+        }
+        staging {
+            applicationId "id.klinikrumah.internal"
+            resValue "string", "version", "1.0.0"
+            resValue "string", "app_name", "Internal Klinik RUmah Staging"
+            resValue "string", "server_client_id", "449506311554-cjplcvj5dkkvfins5nj14a9n9vki7uok.apps.googleusercontent.com"
+            buildConfigField "String", "HOST_PORT", KLINIKRUMAHID_HOST_PORT_STG
+        }
+        production01 {
+            applicationId "id.klinikrumah.internal"
+            resValue "string", "version", "1.0.0"
+            resValue "string", "app_name", "Internal Klinik RUmah App Image"
+            resValue "string", "server_client_id", "449506311554-cjplcvj5dkkvfins5nj14a9n9vki7uok.apps.googleusercontent.com"
+            buildConfigField "String", "HOST_PORT", KLINIKRUMAHID_HOST_PORT_APP_IMG
+        }
+        production {
+            applicationId "id.klinikrumah.internal"
+            resValue "string", "version", "1.0.0"
+            resValue "string", "app_name", "Internal Klinik RUmah"
+            resValue "string", "server_client_id", "449506311554-cjplcvj5dkkvfins5nj14a9n9vki7uok.apps.googleusercontent.com"
+            buildConfigField "String", "HOST_PORT", KLINIKRUMAHID_HOST_PORT_PROD
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            def SEP = "_"
+            def appName = "klinikrumah-internal"
+            def version = "v" + variant.versionName
+            def flavor = variant.productFlavors[0].name
+            def buildType = variant.variantData.variantConfiguration.buildType.name
+            def formattedDate = new Date().format('ddMMyy_HHmm')
+
+            def newApkName = appName + SEP + version + SEP + flavor + SEP + buildType + SEP + formattedDate + ".apk"
+
+            outputFileName = newApkName
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
@@ -33,6 +101,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.2.2'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     //
+    implementation 'com.google.api-client:google-api-client:1.30.5'
     implementation 'com.google.android.gms:play-services-auth:18.0.0'
     implementation 'com.google.android.gms:play-services-auth-api-phone:17.4.0'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'

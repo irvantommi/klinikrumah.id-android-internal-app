@@ -4,8 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -21,21 +21,15 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -57,10 +51,9 @@ import id.klinikrumah.internal.model.Project;
 import id.klinikrumah.internal.util.CommonFunc;
 import id.klinikrumah.internal.view.adapter.ContactAdapter;
 
-public class LeadActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks {
-    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private static final int REQUEST_CHECK_SETTINGS = 2;
-    private static final int REQUEST_SETTING_RESULT = 3;
+public class LeadActivity extends BaseActivity {
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private static final int REQUEST_SETTING_RESULT = 2;
     private static final int INTERVAL = 10000;
     private static final int FASTEST_INTERVAL = 5000;
     private static final String TITLE = "%s Calon Klien";
@@ -197,32 +190,44 @@ public class LeadActivity extends BaseActivity implements GoogleApiClient.Connec
     }
 
     @Override
-    public void onConnected(@Nullable Bundle bundle) {
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_SETTING_RESULT) {
+            checkPermission();
+        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
+        if (requestCode == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
             if (permissions.length > 0 && permissions[0].equalsIgnoreCase(Manifest.permission.ACCESS_FINE_LOCATION)) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    showLocationAccessDialog();
-                } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                    showPopUp();
+                    getLastLocation();
+//                } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 }
             }
         }
     }
 
+    // https://developer.android.com/guide/topics/ui/dialogs
     private void showPopUp() {
-        startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), REQUEST_SETTING_RESULT);
+        // Use the Builder class for convenient dialog construction
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.allow_location)
+                .setPositiveButton(R.string.allow, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS),
+                                REQUEST_SETTING_RESULT);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+        builder.create().show();
     }
 
     private void checkPermission() {
@@ -230,50 +235,15 @@ public class LeadActivity extends BaseActivity implements GoogleApiClient.Connec
             String accessFineLocation = Manifest.permission.ACCESS_FINE_LOCATION;
             List<String> permissionList = new ArrayList<>();
             if (CommonFunc.isGranted(this, accessFineLocation)) {
-                showLocationAccessDialog();
+                getLastLocation();
             } else {
                 permissionList.add(accessFineLocation);
                 String[] params = permissionList.toArray(new String[permissionList.size()]);
-                requestPermissions(params, MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+                requestPermissions(params, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
             }
         } else {
-            showLocationAccessDialog();
+            getLastLocation();
         }
-    }
-
-    private void showLocationAccessDialog() {
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-        builder.setAlwaysShow(true);
-
-        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addApi(LocationServices.API)
-                .build();
-        googleApiClient.connect();
-
-        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(
-                googleApiClient, builder.build());
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-            @Override
-            public void onResult(@NotNull LocationSettingsResult locationSettingsResult) {
-                final Status status = locationSettingsResult.getStatus();
-                switch (status.getStatusCode()) {
-                    case LocationSettingsStatusCodes.SUCCESS:
-                        getLastLocation();
-                        break;
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        try {
-                            status.startResolutionForResult(LeadActivity.this, REQUEST_CHECK_SETTINGS);
-                        } catch (IntentSender.SendIntentException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        getLastLocation();
-                        break;
-                }
-            }
-        });
     }
 
     private void getLastLocation() {

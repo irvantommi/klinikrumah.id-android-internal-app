@@ -1,55 +1,45 @@
 package id.klinikrumah.internal.util;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
-import org.jetbrains.annotations.NotNull;
+import id.klinikrumah.internal.App;
 
 public class SharedPref {
+    private static final String CACHE = "cache";
+    private static SharedPreferences sharedPref = App.getInstance().getSharedPreferences(CACHE, Activity.MODE_PRIVATE);
+    private static Editor editor = sharedPref.edit();
 
-    public static void delete(String prefName, @NotNull Context context, String KEY) {
-        SharedPreferences credentialDataPref = context.getSharedPreferences(prefName, Activity.MODE_PRIVATE);
-        Editor editorPreference = credentialDataPref.edit();
-        editorPreference.remove(KEY);
-        editorPreference.apply();
+    public static void delete(String KEY) {
+        editor.remove(KEY);
+        editor.apply();
     }
 
-    public static void putString(String prefName, @NotNull Context context, String KEY, String value) {
-        SharedPreferences credentialDataPref = context.getSharedPreferences(prefName, Activity.MODE_PRIVATE);
-        Editor editorPreference = credentialDataPref.edit();
-        editorPreference.putString(KEY, value);
-        editorPreference.apply();
+    public static void putString(String KEY, String value) {
+        editor.putString(KEY, value);
+        editor.apply();
     }
 
-    public static String getString(String prefName, @NotNull Context context, String KEY) {
-        SharedPreferences credentialDataPref = context.getSharedPreferences(prefName, Activity.MODE_PRIVATE);
-        return credentialDataPref.getString(KEY, "");
+    public static String getString(String KEY) {
+        return sharedPref.getString(KEY, "");
     }
 
-    public static void putInt(String prefName, @NotNull Context context, String KEY, int value) {
-        SharedPreferences credentialDataPref = context.getSharedPreferences(prefName, Activity.MODE_PRIVATE);
-        Editor editorPreference = credentialDataPref.edit();
-        editorPreference.putInt(KEY, value);
-        editorPreference.apply();
+    public static void putInt(String KEY, int value) {
+        editor.putInt(KEY, value);
+        editor.apply();
     }
 
-    public static int getInt(String prefName, @NotNull Context context, String KEY) {
-        SharedPreferences credentialDataPref = context.getSharedPreferences(prefName, Activity.MODE_PRIVATE);
-        return credentialDataPref.getInt(KEY, 0);
+    public static int getInt(String KEY) {
+        return sharedPref.getInt(KEY, 0);
     }
 
-    public static void putBoolean(String prefName, @NotNull Context context, String KEY, Boolean value) {
-        SharedPreferences credentialDataPref = context.getSharedPreferences(prefName, Activity.MODE_PRIVATE);
-        Editor editorPreference = credentialDataPref.edit();
-        editorPreference.putBoolean(KEY, value);
-        editorPreference.apply();
+    public static void putBoolean(String KEY, Boolean value) {
+        editor.putBoolean(KEY, value);
+        editor.apply();
     }
 
-    public static boolean getBoolean(String prefName, @NotNull Context context, String KEY) {
-        SharedPreferences credentialDataPref = context.getSharedPreferences(prefName, Activity.MODE_PRIVATE);
-        return credentialDataPref.getBoolean(KEY, false);
+    public static boolean getBoolean(String KEY) {
+        return sharedPref.getBoolean(KEY, false);
     }
-
 }

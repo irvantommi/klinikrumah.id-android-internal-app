@@ -19,6 +19,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -41,6 +43,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     // other class
     protected App app = App.getInstance();
     protected ApiInterface api;
+    protected ApiInterface apiGoogle;
     protected Gson gson;
     protected EventBus eventBus;
     // from xml
@@ -63,6 +66,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         api = ApiClient.getRetrofit().create(ApiInterface.class);
+        apiGoogle = ApiClient.getRGoogle().create(ApiInterface.class);
         gson = app.getGson();
         eventBus = app.getEventBus();
         if (getSupportActionBar() != null) {
@@ -233,6 +237,10 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected String setString(CharSequence input) {
         return CommonFunc.setStringFromCharSequence(input);
+    }
+
+    protected void showSnackBar(String message) {
+        Snackbar.make(flContainer, message, BaseTransientBottomBar.LENGTH_LONG).show();
     }
 
     protected interface SearchListener {

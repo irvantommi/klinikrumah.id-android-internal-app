@@ -157,7 +157,13 @@ public class LeadListActivity extends BaseActivity {
             setContentVisibility(View.GONE);
             fabNew.setVisibility(View.GONE);
             showHideProgressBar();
-            Call<List<JsonObject>> leadListCall = api.getLeadList();
+            // temp
+            leadList = getDummy();
+            adapter.addAll(leadList);
+            setContentVisibility(View.VISIBLE);
+            fabNew.setVisibility(View.VISIBLE);
+            showHideProgressBar();
+            /*Call<List<JsonObject>> leadListCall = api.getLeadList();
             leadListCall.enqueue(new Callback<List<JsonObject>>() {
                 @Override
                 public void onResponse(Call<List<JsonObject>> call, Response<List<JsonObject>> response) {
@@ -178,16 +184,11 @@ public class LeadListActivity extends BaseActivity {
                 @Override
                 public void onFailure(Call<List<JsonObject>> call, Throwable t) {
                     Log.e("Retrofit Get", t.toString());
-                    // temp
-                    leadList = getDummy();
-                    adapter.addAll(leadList);
-                    setContentVisibility(View.VISIBLE);
-                    fabNew.setVisibility(View.VISIBLE);
 //                errorType = ErrorType.GENERAL;
 //                setError(errorType);
                     showHideProgressBar();
                 }
-            });
+            });*/
         } else if (isFilter) {
             filter();
         }
