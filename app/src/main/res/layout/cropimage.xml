@@ -1,0 +1,58 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <view
+        android:id="@+id/image_view"
+        class="id.klinikrumah.internal.util.image.CropImageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/linear_layout_fun"
+        android:alpha="0.8"
+        android:background="#000000" />
+
+    <LinearLayout
+        android:id="@+id/linear_layout_fun"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:weightSum="4">
+
+
+        <Button
+            android:id="@+id/discard"
+            style="@style/KRButton.Active"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/cancel" />
+
+        <ImageButton
+            android:id="@+id/rotateLeft"
+            style="@style/KRButton.Inactive"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/v2_ic_rotate_left" />
+
+        <ImageButton
+            android:id="@+id/rotateRight"
+            style="@style/KRButton.Inactive"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/v2_ic_rotate_right" />
+
+        <Button
+            android:id="@+id/save"
+            style="@style/KRButton.Active"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/save" />
+    </LinearLayout>
+</RelativeLayout>

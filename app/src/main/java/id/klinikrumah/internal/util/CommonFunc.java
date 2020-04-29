@@ -1,6 +1,8 @@
 package id.klinikrumah.internal.util;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -11,10 +13,15 @@ import android.os.Build;
 import android.text.Editable;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.regex.Pattern;
 
 import id.klinikrumah.internal.constant.S;
@@ -84,5 +91,22 @@ public class CommonFunc {
 
     public static boolean isGranted(Context context, String permission) {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public static void copyStream(@NonNull InputStream input, OutputStream output) throws IOException {
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = input.read(buffer)) != -1) {
+            output.write(buffer, 0, bytesRead);
+        }
+    }
+
+    public static void showDialog(Activity activity, String msg, String negativeBtnTxt,
+                                  DialogInterface.OnClickListener onClick) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
+        dialogBuilder.setMessage(msg)
+                .setCancelable(false)
+                .setNegativeButton(negativeBtnTxt, onClick);
+        dialogBuilder.create().show();
     }
 }

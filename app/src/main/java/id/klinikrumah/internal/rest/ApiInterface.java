@@ -2,10 +2,12 @@ package id.klinikrumah.internal.rest;
 
 import com.google.gson.JsonObject;
 
+import java.io.File;
 import java.util.List;
 
 import id.klinikrumah.internal.model.User;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -35,9 +37,10 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST(UPLOAD_RESUMABLE)
     Call<JsonObject> upload(
-            @Header(CONTENT_LENGTH) String contentLength,
+            @Header(CONTENT_LENGTH) int contentLength,
             @Header(X_UPLOAD_CONTENT_TYPE) String xUploadContentType,
-            @Header(X_UPLOAD_CONTENT_LENGTH) String xUploadContentLength,
+            @Header(X_UPLOAD_CONTENT_LENGTH) int xUploadContentLength,
+            @Body File file,
             @Field("id") String fileId,
             @Field("name") String fileName
     );

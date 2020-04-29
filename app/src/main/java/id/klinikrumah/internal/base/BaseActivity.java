@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -48,7 +49,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected EventBus eventBus;
     // from xml
     protected AppBarLayout ablBase;
-    protected ImageView ivBack;
+    protected ImageButton ibBack;
     protected TextView tvTitleToolbar;
     protected ImageView ivSearch;
     protected EmptySubmitSearchView svBase;
@@ -91,7 +92,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         RelativeLayout rlBase = (RelativeLayout) getLayoutInflater().inflate(R.layout.activity_base,
                 null);
         ablBase = rlBase.findViewById(R.id.abl_base);
-        ivBack = rlBase.findViewById(R.id.iv_back);
+        ibBack = rlBase.findViewById(R.id.ib_back);
         tvTitleToolbar = rlBase.findViewById(R.id.tv_title_toolbar);
         ivSearch = rlBase.findViewById(R.id.iv_search);
         svBase = rlBase.findViewById(R.id.sv_base);
@@ -103,7 +104,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         btnBase = rlBase.findViewById(R.id.btn_base);
         pbBase = rlBase.findViewById(R.id.pb_base);
 
-        ivBack.setOnClickListener(new View.OnClickListener() {
+        ibBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onBackPressed();

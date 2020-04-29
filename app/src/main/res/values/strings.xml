@@ -33,7 +33,13 @@
     <string name="date">Tanggal</string>
     <string name="todo">PR</string>
     <string name="contact">Kontak</string>
-
+    <string name="choose_from">Dipilih dari:</string>
+    <string-array name="file_upload_array">
+        <item>Galeri</item>
+        <item>Kamera</item>
+        <item>Pengelola Berkas</item>
+        <item>Batal</item>
+    </string-array>
     <string name="error_general">Halaman Tidak Dapat Diakses</string>
     <string name="error_general_content">Mohon maaf, terjadi kesalahan. Silakan coba kembali</string>
     <string name="data_not_found">Data tidak ditemukan</string>
@@ -49,4 +55,11 @@
     <string name="plus">+</string>
     <string name="remove">x</string>
     <string name="allow">Izinkan</string>
+    <string name="attach">Lampirkan</string>
+    <string name="save">Simpan</string>
+    <string name="saving_image">Menyimpan Gambar</string>
+    <string name="preparing_card">Mendeteksi Kartu Penyimpanan</string>
+    <string name="no_storage_card">Kartu Penyimpanan tidak terdeteksi</string>
+    <string name="not_enough_space">Ruang tidak cukup</string>
+    <string name="alert_max_file">Ukuran maksimal file dokumen di bawah </string>
 </resources>

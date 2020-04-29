@@ -5,7 +5,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -16,12 +15,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.gson.JsonObject;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import id.klinikrumah.internal.R;
@@ -32,9 +29,6 @@ import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.Project;
 import id.klinikrumah.internal.util.ErrorType;
 import id.klinikrumah.internal.view.adapter.LeadAdapter;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class LeadListActivity extends BaseActivity {
     private static final String LEAD_LIST = "lead_list";
@@ -71,7 +65,7 @@ public class LeadListActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lead_list);
-        ivBack.setVisibility(View.GONE);
+        ibBack.setVisibility(View.GONE);
         tvTitleToolbar.setText(getString(R.string.title_activity_lead_list));
         ivSearch.setVisibility(View.VISIBLE);
 

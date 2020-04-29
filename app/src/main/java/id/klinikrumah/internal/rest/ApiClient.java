@@ -2,11 +2,14 @@ package id.klinikrumah.internal.rest;
 
 import java.io.IOException;
 
+import id.klinikrumah.internal.App;
+import id.klinikrumah.internal.R;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
@@ -49,7 +52,7 @@ public class ApiClient {
                 Request original = chain.request();
 
                 Request request = original.newBuilder()
-                        .header(AUTHORIZATION, BEARER)
+                        .header(AUTHORIZATION, BEARER + App.getInstance().getString(R.string.server_client_id))
                         .header(CONTENT_TYPE, CONTENT_TYPE_DEFAULT)
                         .method(original.method(), original.body())
                         .build();
@@ -61,7 +64,8 @@ public class ApiClient {
         if (rGoogle == null) {
             rGoogle = new Retrofit.Builder()
                     .baseUrl(GOOGLE_API)
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(App.getInstance().getGson()))
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .client(client)
                     .build();
         }

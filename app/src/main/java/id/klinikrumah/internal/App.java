@@ -31,6 +31,7 @@ public class App extends MultiDexApplication {
         eventBus = new EventBus();
         GsonBuilder gsonBuilder = new GsonBuilder();
 //        gsonBuilder.registerTypeAdapter(Facebook.class, new FacebookDeserializer());
+        gsonBuilder.setLenient();
         gson = gsonBuilder.create();
 
     }

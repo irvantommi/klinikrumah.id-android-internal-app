@@ -3,15 +3,22 @@ package id.klinikrumah.internal.view.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
+import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -22,6 +29,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,9 +40,15 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.gson.JsonObject;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -44,21 +58,28 @@ import java.util.TimeZone;
 
 import id.klinikrumah.internal.R;
 import id.klinikrumah.internal.base.BaseActivity;
+import id.klinikrumah.internal.constant.S;
 import id.klinikrumah.internal.model.Action;
 import id.klinikrumah.internal.model.Client;
+import id.klinikrumah.internal.model.Image;
 import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.Project;
 import id.klinikrumah.internal.util.CommonFunc;
+import id.klinikrumah.internal.util.image.CropImage;
+import id.klinikrumah.internal.util.image.InternalContentProvider;
 import id.klinikrumah.internal.view.adapter.ContactAdapter;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LeadActivity extends BaseActivity {
-    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private static final int REQUEST_SETTING_RESULT = 2;
     private static final int INTERVAL = 10000;
     private static final int FASTEST_INTERVAL = 5000;
     private static final String TITLE = "%s Calon Klien";
     private static final String LEAD = "lead";
     private static final String DATE_FORMAT = "dd/MM/yy";
+    private final String TAG = this.getClass().getSimpleName();
+    private final List<Image> filePathList = new ArrayList<>();
     // other class
     private ContactAdapter contactAdapter = new ContactAdapter();
     // from xml
@@ -82,6 +103,11 @@ public class LeadActivity extends BaseActivity {
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
     private Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+    private String state;
+    private File fileCamera, file;
+    private int maxSizeFile = 1000000;
+    private String idFields;
+    private int positionUpload;
 
     public static void show(Context context, String lead) {
         Intent intent = new Intent(context, LeadActivity.class);
@@ -117,7 +143,7 @@ public class LeadActivity extends BaseActivity {
         btnLatLong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                checkPermission();
+                checkPermissionLocation();
             }
         });
         rvContact.setAdapter(contactAdapter);
@@ -155,10 +181,13 @@ public class LeadActivity extends BaseActivity {
         });
         Button btnCancel = findViewById(R.id.btn_cancel);
         Button btnSubmit = findViewById(R.id.btn_submit);
+        btnCancel.setText(R.string.attach);
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+//                finish();
+                checkPermissionReadWrite();
+                createFolder();
             }
         });
         btnSubmit.setOnClickListener(new View.OnClickListener() {
@@ -192,8 +221,68 @@ public class LeadActivity extends BaseActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_SETTING_RESULT) {
-            checkPermission();
+        if (resultCode == Activity.RESULT_OK) {
+            deleteLocalFile(idFields);
+            if (requestCode == S.RequestCode.SETTING_RESULT) {
+                checkPermissionLocation();
+            } else if (requestCode == S.RequestCode.OPEN_GALLERY) {
+                if (data != null) {
+                    file = updateFileLocation(data.getData(), "jpg");
+                    fileCamera = updateFileLocation(data.getData(), "jpg");
+                }
+                copyStream(data.getData());
+                if (getFileSize(new File(file.getPath())) <= maxSizeFile) {
+                    startCropImage(file);
+                } else {
+                    try {
+                        CommonFunc.showDialog(this, getString(R.string.alert_max_file) +
+                                " " + maxSizeFile + " MB", "OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                checkPermissionReadWrite();
+                            }
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else if (requestCode == S.RequestCode.TAKE_PICTURE) {
+                if (getFileSize(new File(fileCamera.getPath())) <= maxSizeFile) {
+                    startCropImage(fileCamera);
+                } else {
+                    CommonFunc.showDialog(this, getString(R.string.alert_max_file) + " " +
+                            maxSizeFile + " MB", "OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            checkPermissionReadWrite();
+                        }
+                    });
+                }
+            } else if (requestCode == S.RequestCode.TAKE_PICTURE_WITH_CROP) {
+                addFilePathList(data.getStringExtra(CropImage.IMAGE_PATH), "image");
+                setDataUpload(file.getName());
+                setDataUpload(fileCamera.getName());
+                upload();
+            } else if (requestCode == S.RequestCode.DOC) {
+                file = updateFileLocation(data.getData(), "pdf");
+                copyStream(data.getData());
+                String path = file.getPath();
+                if (getFileSize(new File(path)) <= maxSizeFile) {
+                    addFilePathList(path, "pdf");
+                    setDataUpload(file.getName());
+                } else {
+                    CommonFunc.showDialog(this, getString(R.string.alert_max_file) + " " +
+                            maxSizeFile + " MB", "OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            checkPermissionReadWrite();
+                        }
+                    });
+                }
+            }
         }
     }
 
@@ -201,12 +290,27 @@ public class LeadActivity extends BaseActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
-            if (permissions.length > 0 && permissions[0].equalsIgnoreCase(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getLastLocation();
-//                } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                }
+        boolean isGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+//        boolean isDenied = grantResults[0] == PackageManager.PERMISSION_DENIED;
+        if (permissions.length > 0 && isGranted) {
+            String permission = permissions[0];
+            switch (requestCode) {
+                case S.RequestCode.LOCATION:
+                    if (permission.equalsIgnoreCase(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                        getLastLocation();
+                    }
+                    break;
+                case S.RequestCode.EXTERNAL_STORAGE:
+                    if (permission.equalsIgnoreCase(Manifest.permission.READ_EXTERNAL_STORAGE) ||
+                            permission.equalsIgnoreCase(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        chooseFile();
+                    }
+                    break;
+                case S.RequestCode.CAMERA:
+                    if (permission.equalsIgnoreCase(Manifest.permission.CAMERA)) {
+                        selectImageCamera();
+                    }
+                    break;
             }
         }
     }
@@ -219,7 +323,7 @@ public class LeadActivity extends BaseActivity {
                 .setPositiveButton(R.string.allow, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS),
-                                REQUEST_SETTING_RESULT);
+                                S.RequestCode.SETTING_RESULT);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -230,7 +334,7 @@ public class LeadActivity extends BaseActivity {
         builder.create().show();
     }
 
-    private void checkPermission() {
+    private void checkPermissionLocation() {
         if (Build.VERSION.SDK_INT > 22) {
             String accessFineLocation = Manifest.permission.ACCESS_FINE_LOCATION;
             List<String> permissionList = new ArrayList<>();
@@ -239,7 +343,7 @@ public class LeadActivity extends BaseActivity {
             } else {
                 permissionList.add(accessFineLocation);
                 String[] params = permissionList.toArray(new String[permissionList.size()]);
-                requestPermissions(params, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+                requestPermissions(params, S.RequestCode.LOCATION);
             }
         } else {
             getLastLocation();
@@ -271,6 +375,248 @@ public class LeadActivity extends BaseActivity {
 
     private void setLatLong(@NotNull Location location) {
         tvLatLong.setText(String.format("%s, %s", location.getLatitude(), location.getLongitude()));
+    }
+
+    private void checkPermissionReadWrite() {
+        if (Build.VERSION.SDK_INT > 22) {
+            String readExternalStorage = android.Manifest.permission.READ_EXTERNAL_STORAGE;
+            String writeExternalStorage = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+            List<String> permissionList = new ArrayList<>();
+            if (CommonFunc.isGranted(this, readExternalStorage) &&
+                    CommonFunc.isGranted(this, writeExternalStorage)) {
+                chooseFile();
+            } else {
+                permissionList.add(readExternalStorage);
+                permissionList.add(writeExternalStorage);
+                String[] params = permissionList.toArray(new String[permissionList.size()]);
+                requestPermissions(params, S.RequestCode.EXTERNAL_STORAGE);
+            }
+        } else {
+            chooseFile();
+        }
+    }
+
+    private void createFolder() {
+        state = Environment.getExternalStorageState();
+        String path = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/AloTemp";
+        file = new File(path);
+        fileCamera = new File(path);
+        if (!file.exists()) {
+            file.mkdir();
+        }
+    }
+
+    private void chooseFile() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder
+                .setTitle(R.string.choose_from)
+                .setItems(R.array.file_upload_array, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        switch (i) {
+                            case 0:
+                                selectImageGallery();
+                                break;
+                            case 1:
+                                checkPermissionCamera();
+                                break;
+                            case 2:
+                                browseDocuments();
+                                break;
+                        }
+                        dialog.dismiss();
+                    }
+                });
+        dialogBuilder.create().show();
+    }
+
+    private void selectImageGallery() {
+        Intent photoPickerIntent;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            photoPickerIntent = new Intent(Intent.ACTION_PICK,
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        } else {
+            photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        }
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, S.RequestCode.OPEN_GALLERY);
+    }
+
+    private void checkPermissionCamera() {
+        if (Build.VERSION.SDK_INT > 22) {
+            String camera = Manifest.permission.CAMERA;
+            List<String> permissionList = new ArrayList<>();
+            if (CommonFunc.isGranted(this, camera)) {
+                selectImageCamera();
+            } else {
+                permissionList.add(camera);
+                String[] params = permissionList.toArray(new String[permissionList.size()]);
+                requestPermissions(params, S.RequestCode.CAMERA);
+            }
+        } else {
+            selectImageCamera();
+        }
+    }
+
+    private void selectImageCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && intent.resolveActivity(getPackageManager()) != null) {
+            try {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(this,
+                        "id.klinikrumah.internal.fileprovider", createImageFile()));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            try {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Environment.MEDIA_MOUNTED.equals(state) ?
+                        Uri.fromFile(fileCamera) : InternalContentProvider.CONTENT_URI);
+                intent.putExtra("return-data", true);
+            } catch (ActivityNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        startActivityForResult(intent, S.RequestCode.TAKE_PICTURE);
+    }
+
+    @NotNull
+    private File createImageFile() throws IOException {
+        File image = File.createTempFile("JPEG" + "_", ".jpg",
+                getExternalFilesDir(Environment.DIRECTORY_PICTURES));
+        fileCamera = new File(image.getAbsolutePath());
+        return image;
+    }
+
+    private void browseDocuments() {
+        // if you wanna add more extension to be able for import add this array the mimetypes
+        String[] mimeTypes = {"application/pdf"};
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            intent.setType(mimeTypes[0]);
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+        } else {
+            StringBuilder mimeTypesStr = new StringBuilder();
+            for (String mimeType : mimeTypes) {
+                mimeTypesStr.append(mimeType).append("|");
+            }
+            intent.setType(mimeTypesStr.substring(0, mimeTypesStr.length() - 1));
+        }
+        startActivityForResult(Intent.createChooser(intent, "ChooseFile"), S.RequestCode.DOC);
+    }
+
+    private void deleteLocalFile(String fieldId) {
+        for (int i = 0; i < filePathList.size(); i++) {
+            if (filePathList.get(i).getId().equals(fieldId)) {
+                new File(filePathList.get(i).getPath()).delete();
+                filePathList.remove(i);
+            }
+        }
+//        createClaimTriageAdapter = new CreateClaimTriageAdapter(this, dataFormClaimModels, claimMenuModels, claimCause, this);
+//        formClaimRv.setAdapter(createClaimTriageAdapter);
+    }
+
+    private File updateFileLocation(Uri data, String extension) {
+        boolean isMounted = Environment.MEDIA_MOUNTED.equals(state);
+        return new File(String.format("%s/KR_Temp", isMounted ?
+                this.getExternalFilesDir(Environment.DIRECTORY_PICTURES) : getFilesDir()),
+                String.format(getFileName(data), ""));
+    }
+
+    public String getFileName(@NotNull Uri uri) {
+        String result = null;
+        if (uri.getScheme() != null && uri.getScheme().equals("content")) {
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
+    }
+
+    private void copyStream(Uri uri) {
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            if (inputStream != null) {
+                CommonFunc.copyStream(inputStream, fileOutputStream);
+                fileOutputStream.close();
+                inputStream.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int getFileSize(@NotNull File file) {
+        if (file.exists()) {
+            String size = new DecimalFormat("0").format(file.length() / 1024 / 1024);
+            Log.e("File", "File!" + " " + size);
+            return Integer.parseInt(size);
+        } else {
+            Log.e("File", "File does not exists!");
+            return 0;
+        }
+    }
+
+    private void startCropImage(@NonNull File file) {
+        Intent intent = new Intent(this, CropImage.class);
+        intent.putExtra(CropImage.IMAGE_PATH, file.getPath());
+        intent.putExtra(CropImage.SCALE, true);
+        intent.putExtra(CropImage.ASPECT_X, 3);
+        intent.putExtra(CropImage.ASPECT_Y, 3);
+        intent.putExtra(CropImage.OUTPUT_X, 300);
+        intent.putExtra(CropImage.OUTPUT_Y, 300);
+        startActivityForResult(intent, S.RequestCode.TAKE_PICTURE_WITH_CROP);
+    }
+
+    private void addFilePathList(String path, String type) {
+        Image image = new Image();
+        image.setId(idFields);
+        image.setPath(path);
+        image.setType(type);
+        filePathList.add(image);
+    }
+
+    private void setDataUpload(String fileName) {
+        int document = 0;
+//        for (int i = 0; i < dataFormClaimModels.size(); i++) {
+//            if (dataFormClaimModels.get(i).getSection().equals("document")) {
+//                document = i;
+//            }
+//        }
+//        dataFormClaimModels.get(document).getFormFieldModels().get(positionUpload).setValue(fileName);
+//        createClaimTriageAdapter.notifyItemChanged(document);
+    }
+
+    // TODO: 29/04/20 https://futurestud.io/tutorials/retrofit-2-how-to-upload-files-to-server 
+    private void upload() {
+        Image image = filePathList.get(0);
+        String path = image.getPath();
+        Call<JsonObject> upload = apiGoogle.upload(path.length(), image.getType() + "/jpeg", 2000000,
+                new File(path), image.getId(), path);
+        upload.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                response.body();
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.e(TAG, "", t);
+            }
+        });
     }
 
     private void setData() {
