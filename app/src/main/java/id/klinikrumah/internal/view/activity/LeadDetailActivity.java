@@ -23,12 +23,12 @@ import id.klinikrumah.internal.model.Action;
 import id.klinikrumah.internal.model.Client;
 import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.Project;
-import id.klinikrumah.internal.util.CommonFunc;
-import id.klinikrumah.internal.util.ErrorType;
+import id.klinikrumah.internal.util.static_.CommonFunc;
+import id.klinikrumah.internal.util.enum_.ErrorType;
 import id.klinikrumah.internal.view.adapter.ContactDetailAdapter;
 
 public class LeadDetailActivity extends BaseActivity {
-    private static final String TITLE = "Detail Calon Klien";
+    private static final String TITLE = "Detail Peminat";
     private static final String LEAD = "lead";
     // other class
     ContactDetailAdapter contactAdapter = new ContactDetailAdapter();

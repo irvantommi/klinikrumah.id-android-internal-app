@@ -16,9 +16,9 @@ import java.util.List;
 
 import id.klinikrumah.internal.R;
 import id.klinikrumah.internal.constant.S;
-import id.klinikrumah.internal.util.CommonFunc;
+import id.klinikrumah.internal.util.static_.CommonFunc;
 
-import static id.klinikrumah.internal.util.CommonFunc.setDefaultIfEmpty;
+import static id.klinikrumah.internal.util.static_.CommonFunc.setDefaultIfEmpty;
 
 public class ContactDetailAdapter extends RecyclerView.Adapter<ContactDetailAdapter.ViewHolder> {
     private List<String> contactList;

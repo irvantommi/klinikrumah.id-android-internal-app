@@ -27,7 +27,7 @@ import id.klinikrumah.internal.model.Action;
 import id.klinikrumah.internal.model.Client;
 import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.Project;
-import id.klinikrumah.internal.util.ErrorType;
+import id.klinikrumah.internal.util.enum_.ErrorType;
 import id.klinikrumah.internal.view.adapter.LeadAdapter;
 
 public class LeadListActivity extends BaseActivity {

@@ -8,7 +8,7 @@ import com.google.gson.GsonBuilder;
 import de.greenrobot.event.EventBus;
 import id.klinikrumah.internal.constant.Pref;
 import id.klinikrumah.internal.model.GoogleUserData;
-import id.klinikrumah.internal.util.SharedPref;
+import id.klinikrumah.internal.util.static_.SharedPref;
 
 public class App extends MultiDexApplication {
     private static App instance;

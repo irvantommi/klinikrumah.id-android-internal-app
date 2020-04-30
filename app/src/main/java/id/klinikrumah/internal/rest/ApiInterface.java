@@ -2,24 +2,27 @@ package id.klinikrumah.internal.rest;
 
 import com.google.gson.JsonObject;
 
-import java.io.File;
 import java.util.List;
 
 import id.klinikrumah.internal.model.User;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
-import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.HTTP;
 import retrofit2.http.Header;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Part;
 import retrofit2.http.Url;
 
 public interface ApiInterface {
     String CONTENT_LENGTH = "Content-Length";
-    String CONTENT_RANGE = "Content-Range"; // https://developers.google.com/drive/api/v2/manage-uploads#multiple-chunks_1
+    String CONTENT_RANGE = "Content-Range"; // https://developers.google.com/drive/api/v3/manage-uploads#multiple-chunks_1
     String X_UPLOAD_CONTENT_TYPE = "X-Upload-Content-Type";
     String X_UPLOAD_CONTENT_LENGTH = "X-Upload-Content-Length";
     String UPLOAD_RESUMABLE = "?uploadType=resumable";
@@ -34,15 +37,15 @@ public interface ApiInterface {
 //            "X-Upload-Content-Type: image/jpeg",
 //            "X-Upload-Content-Length: 2000000"
 //    })
-    @FormUrlEncoded
+    @Multipart
     @POST(UPLOAD_RESUMABLE)
-    Call<JsonObject> upload(
+    Call<ResponseBody> upload(
             @Header(CONTENT_LENGTH) int contentLength,
             @Header(X_UPLOAD_CONTENT_TYPE) String xUploadContentType,
             @Header(X_UPLOAD_CONTENT_LENGTH) int xUploadContentLength,
-            @Body File file,
-            @Field("id") String fileId,
-            @Field("name") String fileName
+            @Part("id") RequestBody fileId,
+            @Part("name") RequestBody fileName,
+            @Part MultipartBody.Part file
     );
 
     @FormUrlEncoded

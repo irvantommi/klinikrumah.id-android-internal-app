@@ -35,9 +35,9 @@ import id.klinikrumah.internal.R;
 import id.klinikrumah.internal.constant.S;
 import id.klinikrumah.internal.rest.ApiClient;
 import id.klinikrumah.internal.rest.ApiInterface;
-import id.klinikrumah.internal.util.CommonFunc;
-import id.klinikrumah.internal.util.EmptySubmitSearchView;
-import id.klinikrumah.internal.util.ErrorType;
+import id.klinikrumah.internal.util.static_.CommonFunc;
+import id.klinikrumah.internal.util.customview.EmptySubmitSearchView;
+import id.klinikrumah.internal.util.enum_.ErrorType;
 import retrofit2.Response;
 
 public abstract class BaseActivity extends AppCompatActivity {

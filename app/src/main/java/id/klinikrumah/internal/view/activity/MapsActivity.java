@@ -1,47 +1,35 @@
 package id.klinikrumah.internal.view.activity;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-
-import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
-import com.google.maps.android.PolyUtil;
 import com.google.maps.errors.ApiException;
-import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
-import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.TravelMode;
 
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import id.klinikrumah.internal.R;
 import id.klinikrumah.internal.base.BaseActivity;
 import id.klinikrumah.internal.constant.S;
-import id.klinikrumah.internal.util.CommonFunc;
+import id.klinikrumah.internal.util.static_.CommonFunc;
 
 public class MapsActivity extends BaseActivity implements OnMapReadyCallback {
     private static final int overview = 0;

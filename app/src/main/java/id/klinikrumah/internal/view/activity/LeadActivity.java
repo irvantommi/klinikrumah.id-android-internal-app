@@ -29,6 +29,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,7 +41,6 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.gson.JsonObject;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -64,10 +64,14 @@ import id.klinikrumah.internal.model.Client;
 import id.klinikrumah.internal.model.Image;
 import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.Project;
-import id.klinikrumah.internal.util.CommonFunc;
+import id.klinikrumah.internal.util.static_.CommonFunc;
 import id.klinikrumah.internal.util.image.CropImage;
 import id.klinikrumah.internal.util.image.InternalContentProvider;
 import id.klinikrumah.internal.view.adapter.ContactAdapter;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -75,7 +79,7 @@ import retrofit2.Response;
 public class LeadActivity extends BaseActivity {
     private static final int INTERVAL = 10000;
     private static final int FASTEST_INTERVAL = 5000;
-    private static final String TITLE = "%s Calon Klien";
+    private static final String TITLE = "%s Peminat";
     private static final String LEAD = "lead";
     private static final String DATE_FORMAT = "dd/MM/yy";
     private final String TAG = this.getClass().getSimpleName();
@@ -181,13 +185,12 @@ public class LeadActivity extends BaseActivity {
         });
         Button btnCancel = findViewById(R.id.btn_cancel);
         Button btnSubmit = findViewById(R.id.btn_submit);
-        btnCancel.setText(R.string.attach);
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                finish();
-                checkPermissionReadWrite();
-                createFolder();
+                finish();
+//                checkPermissionReadWrite();
+//                createFolder();
             }
         });
         btnSubmit.setOnClickListener(new View.OnClickListener() {
@@ -489,7 +492,7 @@ public class LeadActivity extends BaseActivity {
 
     private void browseDocuments() {
         // if you wanna add more extension to be able for import add this array the mimetypes
-        String[] mimeTypes = {"application/pdf"};
+        String[] mimeTypes = {S.MIME_TYPE_PDF};
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -583,7 +586,8 @@ public class LeadActivity extends BaseActivity {
 
     private void addFilePathList(String path, String type) {
         Image image = new Image();
-        image.setId(idFields);
+//        image.setId(idFields);
+        image.setId(CommonFunc.generateUID());
         image.setPath(path);
         image.setType(type);
         filePathList.add(image);
@@ -604,19 +608,42 @@ public class LeadActivity extends BaseActivity {
     private void upload() {
         Image image = filePathList.get(0);
         String path = image.getPath();
-        Call<JsonObject> upload = apiGoogle.upload(path.length(), image.getType() + "/jpeg", 2000000,
-                new File(path), image.getId(), path);
-        upload.enqueue(new Callback<JsonObject>() {
+        File file = new File(path);
+        Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+                .setText("Unggah Gambar/PDF")
+                .setType(S.MIME_TYPE_PDF)
+                .setType(S.MIME_TYPE_JPG)
+                .setStream(Uri.fromFile(file) )
+                .getIntent()
+                .setPackage(S.PKG_DRIVE);
+        startActivityForResult(shareIntent, S.RequestCode.G_DRIVE);
+        /*
+        // create RequestBody instance from file
+        String type = getContentResolver().getType(Uri.fromFile(file));
+        if (type == null) {
+            type = image.getType();
+        }
+        RequestBody requestFile = RequestBody.create(MediaType.parse(type + "/jpeg"), file);
+        // MultipartBody.Part is used to send also the actual file name
+        String fileName = file.getName();
+        MultipartBody.Part body = MultipartBody.Part.createFormData("picture", fileName, requestFile);
+        // add another part within the multipart request
+        RequestBody rgFileId = RequestBody.create(okhttp3.MultipartBody.FORM, image.getId());
+        RequestBody rbFileName = RequestBody.create(okhttp3.MultipartBody.FORM, fileName);
+
+        Call<ResponseBody> upload = apiGoogle.upload(fileName.length(),
+                image.getType() + "/jpeg", (int) file.length(), rgFileId, rbFileName, body);
+        upload.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 response.body();
             }
 
             @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.e(TAG, "", t);
             }
-        });
+        });*/
     }
 
     private void setData() {

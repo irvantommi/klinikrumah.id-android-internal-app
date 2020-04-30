@@ -125,7 +125,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     GoogleUserData userData = new GoogleUserData();
                     userData.setGoogleId(account.getId());
                     userData.setGoogleToken(account.getIdToken());
-                    userData.setName(account.getDisplayName());
+                    userData.setGoogleName(account.getDisplayName());
                     userData.setGivenName(account.getGivenName());
                     userData.setFamilyName(account.getFamilyName());
                     userData.setEmail(account.getEmail());

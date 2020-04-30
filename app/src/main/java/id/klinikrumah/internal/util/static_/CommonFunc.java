@@ -1,4 +1,4 @@
-package id.klinikrumah.internal.util;
+package id.klinikrumah.internal.util.static_;
 
 import android.app.Activity;
 import android.content.Context;
@@ -22,11 +22,17 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import id.klinikrumah.internal.constant.S;
 
 public class CommonFunc {
+    @NotNull
+    public static String generateUID() {
+        return UUID.randomUUID().toString().replace(S.DASH, "");
+    }
+
     public static boolean isValidEmail(String email) {
         Pattern emailPattern = Pattern.compile("^(([^<>()\\[\\].,;:\\s@\"]+(\\.[^<>()\\[\\].,;:\\s@\"]+)*)|(\".+\"))@(([^<>()\\[\\].,;:\\s@\"]+\\.)+[^<>()\\[\\].,;:\\s@\"]{2,})$");
         return !TextUtils.isEmpty(email) && emailPattern.matcher(email).matches();

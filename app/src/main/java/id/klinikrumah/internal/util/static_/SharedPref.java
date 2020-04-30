@@ -1,4 +1,4 @@
-package id.klinikrumah.internal.util;
+package id.klinikrumah.internal.util.static_;
 
 import android.app.Activity;
 import android.content.SharedPreferences;

@@ -1,6 +1,6 @@
 package id.klinikrumah.internal.base;
 
-import id.klinikrumah.internal.util.ServiceStatus;
+import id.klinikrumah.internal.util.enum_.ServiceStatus;
 
 public class BaseEvent {
     protected ServiceStatus serviceStatus;

@@ -3,7 +3,7 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_activity_maps">Peta</string>
-    <string name="title_activity_lead_list">Daftar Calon Klien</string>
+    <string name="title_activity_lead_list">Daftar Peminat</string>
     <!-- v1.0.0 -->
     <string name="email">Email</string>
     <string name="password">Kata Sandi</string>

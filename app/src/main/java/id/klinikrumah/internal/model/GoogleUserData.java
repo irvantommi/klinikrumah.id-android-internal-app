@@ -8,16 +8,16 @@ public class GoogleUserData extends BaseModel {
     @SerializedName("google_id")
     private String googleId;
 
-    @SerializedName("googleToken")
+    @SerializedName("google_token")
     private String googleToken;
 
-    @SerializedName("name")
-    private String name;
+    @SerializedName("google_name")
+    private String googleName;
 
-    @SerializedName("givenName")
+    @SerializedName("given_name")
     private String givenName;
 
-    @SerializedName("familyName")
+    @SerializedName("family_name")
     private String familyName;
 
     @SerializedName("email")
@@ -42,14 +42,12 @@ public class GoogleUserData extends BaseModel {
         this.googleToken = googleToken;
     }
 
-    @Override
-    public String getName() {
-        return name;
+    public String getGoogleName() {
+        return googleName;
     }
 
-    @Override
-    public void setName(String name) {
-        this.name = name;
+    public void setGoogleName(String googleName) {
+        this.googleName = googleName;
     }
 
     public String getGivenName() {

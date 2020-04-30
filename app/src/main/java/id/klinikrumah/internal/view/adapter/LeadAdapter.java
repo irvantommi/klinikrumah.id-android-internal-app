@@ -17,8 +17,8 @@ import java.util.List;
 import id.klinikrumah.internal.R;
 import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.Project;
-import id.klinikrumah.internal.util.CommonFunc;
-import id.klinikrumah.internal.util.ErrorType;
+import id.klinikrumah.internal.util.static_.CommonFunc;
+import id.klinikrumah.internal.util.enum_.ErrorType;
 import id.klinikrumah.internal.view.activity.LeadListActivity;
 
 public class LeadAdapter extends RecyclerView.Adapter<LeadAdapter.ViewHolder> implements Filterable {

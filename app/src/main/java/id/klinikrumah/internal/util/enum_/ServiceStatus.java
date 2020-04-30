@@ -1,4 +1,4 @@
-package id.klinikrumah.internal.util;
+package id.klinikrumah.internal.util.enum_;
 
 public enum ServiceStatus {
     SUCCESS,

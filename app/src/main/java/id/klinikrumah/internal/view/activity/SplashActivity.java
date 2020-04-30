@@ -7,7 +7,6 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import id.klinikrumah.internal.R;
 import id.klinikrumah.internal.base.BaseActivity;
@@ -20,20 +19,18 @@ public class SplashActivity extends BaseActivity {
         setContentView(R.layout.activity_splash);
         ablBase.setVisibility(View.GONE);
 
-        // Check for existing Google Sign In account, if the user is already signed in,
-        // the GoogleSignInAccount will be non-null.
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        app.setLogin(account != null);
-
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                // Check for existing Google Sign In account, if the user is already signed in,
+                // the GoogleSignInAccount will be non-null.
+                app.setLogin(GoogleSignIn.getLastSignedInAccount(SplashActivity.this) != null);
                 if (app.isLogin()) {
                     LeadListActivity.show(SplashActivity.this);
                 } else {
                     LoginActivity.show(SplashActivity.this);
                 }
             }
-        }, 1000);
+        }, 2000);
     }
 }
