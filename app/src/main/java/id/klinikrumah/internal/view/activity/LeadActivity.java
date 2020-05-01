@@ -41,6 +41,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.gson.JsonObject;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -64,14 +65,11 @@ import id.klinikrumah.internal.model.Client;
 import id.klinikrumah.internal.model.Image;
 import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.Project;
+import id.klinikrumah.internal.util.enum_.ErrorType;
 import id.klinikrumah.internal.util.static_.CommonFunc;
 import id.klinikrumah.internal.util.image.CropImage;
 import id.klinikrumah.internal.util.image.InternalContentProvider;
 import id.klinikrumah.internal.view.adapter.ContactAdapter;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -197,13 +195,10 @@ public class LeadActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 finish();
-                submitData(isUpdate);
-                LeadDetailActivity.show(LeadActivity.this, gson.toJson(lead));
+                submitData();
             }
         });
         if (getIntent().hasExtra(LEAD)) {
-//            showHideProgressBar();
-            hideError();
             lead = gson.fromJson(getIntent().getStringExtra(LEAD), Lead.class);
             if (lead != null) {
                 setData();
@@ -401,7 +396,7 @@ public class LeadActivity extends BaseActivity {
 
     private void createFolder() {
         state = Environment.getExternalStorageState();
-        String path = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/AloTemp";
+        String path = String.format("%s/AloTemp", this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath());
         file = new File(path);
         fileCamera = new File(path);
         if (!file.exists()) {
@@ -535,14 +530,18 @@ public class LeadActivity extends BaseActivity {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                 }
             } finally {
-                cursor.close();
+                if (cursor != null) {
+                    cursor.close();
+                }
             }
         }
         if (result == null) {
             result = uri.getPath();
-            int cut = result.lastIndexOf('/');
-            if (cut != -1) {
-                result = result.substring(cut + 1);
+            if (result != null) {
+                int cut = result.lastIndexOf('/');
+                if (cut != -1) {
+                    result = result.substring(cut + 1);
+                }
             }
         }
         return result;
@@ -673,7 +672,7 @@ public class LeadActivity extends BaseActivity {
         }
     }
 
-    private void submitData(boolean isUpdate) {
+    private void submitData() {
         lead.setDescription(setString(etDescription.getText()));
         lead.setBudget(setString(etBudget.getText()));
         lead.setToDo(setString(etTodo.getText()));
@@ -704,5 +703,26 @@ public class LeadActivity extends BaseActivity {
             action.setOffering(setString(etOffering.getText()));
         }
         lead.setAction(action);
+
+        showHideProgressBar();
+        api.saveLead(gson.toJson(lead)).enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+                JsonObject data = processResponse(response);
+                if (data != null) {
+//                    lead = gson.fromJson(data.toString(), Lead.class);
+//                    LeadDetailActivity.show(LeadActivity.this, gson.toJson(lead));
+                    LeadDetailActivity.show(LeadActivity.this, data.toString());
+                } else {
+                    showError(ErrorType.NOT_FOUND);
+                }
+                showHideProgressBar();
+            }
+
+            @Override
+            public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
+                onRetrofitFailure(t.toString());
+            }
+        });
     }
 }

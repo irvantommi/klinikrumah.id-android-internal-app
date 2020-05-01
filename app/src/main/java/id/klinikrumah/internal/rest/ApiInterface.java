@@ -21,14 +21,30 @@ import retrofit2.http.Part;
 import retrofit2.http.Url;
 
 public interface ApiInterface {
+    // Method
+    String GET_LEAD_LIST = "getLeadList";
+    String GET_LEAD_DETAIL = "getLeadDetail/";
+    String SAVE_LEAD = "saveLead";
+    // Header
     String CONTENT_LENGTH = "Content-Length";
     String CONTENT_RANGE = "Content-Range"; // https://developers.google.com/drive/api/v3/manage-uploads#multiple-chunks_1
     String X_UPLOAD_CONTENT_TYPE = "X-Upload-Content-Type";
     String X_UPLOAD_CONTENT_LENGTH = "X-Upload-Content-Length";
     String UPLOAD_RESUMABLE = "?uploadType=resumable";
+    // Field
+    String ID = "id";
+    String NAME = "name";
+    String LEAD = "lead";
 
-    @GET("test/klinikRumah")
-    Call<List<JsonObject>> getLeadList();
+    @GET(GET_LEAD_LIST)
+    Call<JsonObject> getLeadList();
+
+    @GET(GET_LEAD_DETAIL)
+    Call<JsonObject> getLeadDetail(@Url String leadId);
+
+    @FormUrlEncoded
+    @POST(SAVE_LEAD)
+    Call<JsonObject> saveLead(@Field(LEAD) String jsonLead);
 
     // google
     // https://futurestud.io/tutorials/retrofit-add-custom-request-header
@@ -43,8 +59,8 @@ public interface ApiInterface {
             @Header(CONTENT_LENGTH) int contentLength,
             @Header(X_UPLOAD_CONTENT_TYPE) String xUploadContentType,
             @Header(X_UPLOAD_CONTENT_LENGTH) int xUploadContentLength,
-            @Part("id") RequestBody fileId,
-            @Part("name") RequestBody fileName,
+            @Part(ID) RequestBody fileId,
+            @Part(NAME) RequestBody fileName,
             @Part MultipartBody.Part file
     );
 
@@ -55,13 +71,10 @@ public interface ApiInterface {
             @Header(CONTENT_LENGTH) String contentLength,
             @Header(X_UPLOAD_CONTENT_TYPE) String xUploadContentType,
             @Header(X_UPLOAD_CONTENT_LENGTH) String xUploadContentLength,
-            @Field("name") String fileName
+            @Field(NAME) String fileName
     );
 
     // template
-    @GET("login")
-    Call<User> getUser();
-
     @FormUrlEncoded
     @POST("auth")
     Call<JsonObject> login(

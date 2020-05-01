@@ -13,7 +13,7 @@
     <string name="login_by_phone">Masuk dengan Nomor Ponsel</string>
     <string name="login_by_fb">Masuk dengan Facebook</string>
     <string name="login_by_google">Masuk dengan Google</string>
-    <string name="login_message">Dengan Masuk, Anda menyetujui <b>Syarat &amp; Ketentuan</b> serta <b>Privasi</b> KlinikRumah.id</string>
+    <string name="login_message">Dengan Masuk, Anda menyetujui <b>Syarat &amp; Ketentuan</b> serta <b>Kebijakan Privasi</b> KlinikRumah.id</string>
     <string name="dont_have_account_register">Belum punya akun? <b>Daftar</b></string>
     <string name="name">Nama</string>
     <string name="location">Lokasi</string>

@@ -17,10 +17,10 @@ public class ApiClient {
     private static final String SCHEME = "http://";
     private static final String SCHEME_SECURE = "https://";
 
-    private static final String BASE_HOST = "54.169.99.237";
+    private static final String BASE_HOST = "irvandroid.com";
     private static final String BASE_VERSION = "/v1";
-    private static final String BASE_PATH = "/klinikrumah/index.php" + BASE_VERSION;
-    private static final String BASE_URL = SCHEME + BASE_HOST + BASE_PATH + "/";
+    private static final String BASE_PATH = "/klinikrumah-api/index.php/apikr";// + BASE_VERSION;
+    private static final String BASE_URL = SCHEME_SECURE + BASE_HOST + BASE_PATH + "/";
 
     private static final String G_API_HOST = "www.googleapis.com";
     private static final String G_API_VERSION = "/v3";

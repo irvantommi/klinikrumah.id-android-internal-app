@@ -53,7 +53,7 @@ public class LeadAdapter extends RecyclerView.Adapter<LeadAdapter.ViewHolder> im
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.selectLead(lead);
+                listener.selectLead(lead.getId());
             }
         });
     }
@@ -73,7 +73,7 @@ public class LeadAdapter extends RecyclerView.Adapter<LeadAdapter.ViewHolder> im
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 if (filteredList.isEmpty()) {
                     if (((LeadListActivity) ctx).rvLeadList.getVisibility() == View.VISIBLE) {
-                        ((LeadListActivity) ctx).setError(ErrorType.NOT_FOUND);
+                        ((LeadListActivity) ctx).showError(ErrorType.NOT_FOUND);
                     }
                 } else {
                     ((LeadListActivity) ctx).hideError();
@@ -130,7 +130,7 @@ public class LeadAdapter extends RecyclerView.Adapter<LeadAdapter.ViewHolder> im
     }
 
     public interface TaskListener {
-        void selectLead(Lead lead);
+        void selectLead(String leadId);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

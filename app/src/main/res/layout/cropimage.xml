@@ -36,7 +36,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:contentDescription="@string/app_name"
-            android:src="@drawable/v2_ic_rotate_left" />
+            android:src="@drawable/ic_rotate_left" />
 
         <ImageButton
             android:id="@+id/rotateRight"
@@ -45,7 +45,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:contentDescription="@string/app_name"
-            android:src="@drawable/v2_ic_rotate_right" />
+            android:src="@drawable/ic_rotate_right" />
 
         <Button
             android:id="@+id/save"

@@ -15,6 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.JsonObject;
+
+import org.jetbrains.annotations.NotNull;
 
 import id.klinikrumah.internal.R;
 import id.klinikrumah.internal.base.BaseActivity;
@@ -26,10 +29,13 @@ import id.klinikrumah.internal.model.Project;
 import id.klinikrumah.internal.util.static_.CommonFunc;
 import id.klinikrumah.internal.util.enum_.ErrorType;
 import id.klinikrumah.internal.view.adapter.ContactDetailAdapter;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LeadDetailActivity extends BaseActivity {
     private static final String TITLE = "Detail Peminat";
-    private static final String LEAD = "lead";
+    private static final String LEAD_ID = "lead_id";
     // other class
     ContactDetailAdapter contactAdapter = new ContactDetailAdapter();
     // from xml
@@ -51,13 +57,27 @@ public class LeadDetailActivity extends BaseActivity {
     // member var
     private Lead lead = new Lead();
 
-    public static void show(Context context, String lead) {
+    public static void show(Context context, String leadId) {
         Intent intent = new Intent(context, LeadDetailActivity.class);
         Bundle b = new Bundle();
-        b.putString(LEAD, lead);
+        b.putString(LEAD_ID, leadId);
         intent.putExtras(b);
         context.startActivity(intent);
         ((Activity) context).overridePendingTransition(0, 0);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (getIntent().hasExtra(LEAD_ID)) {
+            getData();
+//            lead = gson.fromJson(getIntent().getStringExtra(LEAD_ID), Lead.class);
+//            if (lead != null) {
+//                setData();
+//            }
+        } else {
+            showError(ErrorType.GENERAL);
+        }
     }
 
     @Override
@@ -106,16 +126,30 @@ public class LeadDetailActivity extends BaseActivity {
         rvContact.setAdapter(contactAdapter);
         rvContact.setLayoutManager(new LinearLayoutManager(this));
         rvContact.setNestedScrollingEnabled(false);
-        if (getIntent().hasExtra(LEAD)) {
-//            showHideProgressBar();
-            hideError();
-            lead = gson.fromJson(getIntent().getStringExtra(LEAD), Lead.class);
-            if (lead != null) {
-                setData();
+    }
+
+    private void getData() {
+        showHideProgressBar();
+        hideError();
+        api.getLeadDetail(getIntent().getStringExtra(LEAD_ID)).enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+                JsonObject data = processResponse(response);
+                if (data != null) {
+                    lead = gson.fromJson(data.toString(), Lead.class);
+                    setData();
+                    setContentVisibility(View.VISIBLE);
+                } else {
+                    showError(ErrorType.NOT_FOUND);
+                }
+                showHideProgressBar();
             }
-        } else {
-            setError(ErrorType.GENERAL);
-        }
+
+            @Override
+            public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
+                onRetrofitFailure(t.toString());
+            }
+        });
     }
 
     private void setData() {

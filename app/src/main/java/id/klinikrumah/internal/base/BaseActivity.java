@@ -3,6 +3,7 @@ package id.klinikrumah.internal.base;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.Editable;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -26,8 +27,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 import de.greenrobot.event.EventBus;
 import id.klinikrumah.internal.App;
@@ -61,6 +60,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     private Button btnBase;
     private ProgressBar pbBase;
     // member var
+    protected ErrorType errorType;
     private SearchListener listener;
 
     @Override
@@ -181,9 +181,9 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    protected JsonObject processResponse(@NotNull Response<List<JsonObject>> response) {
-        JsonObject obj = response.body().get(0);
-        if (obj.has(S.RSPNS_STATUS)) {
+    protected JsonObject processResponse(@NotNull Response<JsonObject> response) {
+        JsonObject obj = response.body();
+        if (obj != null && obj.has(S.RSPNS_STATUS)) {
             if (S.RSPNS_SUCCESS.equals(obj.get(S.RSPNS_STATUS).getAsString())) {
                 return obj.has(S.RSPNS_DATA) ? obj.getAsJsonObject(S.RSPNS_DATA) : new JsonObject();
             }
@@ -191,20 +191,21 @@ public abstract class BaseActivity extends AppCompatActivity {
         return null;
     }
 
-    public void setError(@NotNull ErrorType type) {
-        switch (type) {
+    public void showError(@NotNull ErrorType errorType) {
+        this.errorType = errorType;
+        switch (this.errorType) {
             case GENERAL:
-                setError(0, getString(R.string.error_general),
+                showError(0, getString(R.string.error_general),
                         getString(R.string.error_general_content), getString(R.string.try_again));
                 break;
             case NOT_FOUND:
-                setError(0, getString(R.string.data_not_found),
+                showError(0, getString(R.string.data_not_found),
                         getString(R.string.data_not_found_content), getString(R.string.create));
                 break;
         }
     }
 
-    protected void setError(int resId, String title, String content, String btnText) {
+    protected void showError(int resId, String title, String content, String btnText) {
         flContainer.setVisibility(View.GONE);
         llError.setVisibility(View.VISIBLE);
         if (resId != 0) {
@@ -213,6 +214,13 @@ public abstract class BaseActivity extends AppCompatActivity {
         tvBaseTitle.setText(title);
         tvBaseContent.setText(content);
         btnBase.setText(btnText);
+    }
+
+    protected void onRetrofitFailure(String errorMsg) {
+        Log.e("Retrofit Get", errorMsg);
+        errorType = ErrorType.GENERAL;
+        showError(errorType);
+        showHideProgressBar();
     }
 
     protected void setBtnBaseClickListener(View.OnClickListener listener) {
