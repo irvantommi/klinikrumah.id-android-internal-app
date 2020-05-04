@@ -1,16 +1,14 @@
 package id.klinikrumah.internal.model;
 
-public class Image {
+public class File {
     private String id;
-    private String image;
     private String path;
     private String type;
 
-    public Image(){}
+    public File(){}
 
-    public Image(String id, String image, String path, String type){
+    public File(String id, String path, String type){
         this.id = id;
-        this.image = image;
         this.path = path;
         this.type = type;
     }
@@ -21,14 +19,6 @@ public class Image {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 
     public String getPath() {

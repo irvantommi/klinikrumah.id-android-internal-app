@@ -131,7 +131,7 @@ public class LeadDetailActivity extends BaseActivity {
     private void getData() {
         showHideProgressBar();
         hideError();
-        api.getLeadDetail(getIntent().getStringExtra(LEAD_ID)).enqueue(new Callback<JsonObject>() {
+        api.getLeadDetail("getLeadDetail/" + getIntent().getStringExtra(LEAD_ID)).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
                 JsonObject data = processResponse(response);

@@ -1,11 +1,20 @@
 package id.klinikrumah.internal.base;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.Window;
+import android.view.WindowInsets;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -19,6 +28,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
@@ -34,9 +44,10 @@ import id.klinikrumah.internal.R;
 import id.klinikrumah.internal.constant.S;
 import id.klinikrumah.internal.rest.ApiClient;
 import id.klinikrumah.internal.rest.ApiInterface;
-import id.klinikrumah.internal.util.static_.CommonFunc;
 import id.klinikrumah.internal.util.customview.EmptySubmitSearchView;
+import id.klinikrumah.internal.util.customview.StatusBarUtil;
 import id.klinikrumah.internal.util.enum_.ErrorType;
+import id.klinikrumah.internal.util.static_.CommonFunc;
 import retrofit2.Response;
 
 public abstract class BaseActivity extends AppCompatActivity {
@@ -52,6 +63,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected TextView tvTitleToolbar;
     protected ImageView ivSearch;
     protected EmptySubmitSearchView svBase;
+    // member var
+    protected ErrorType errorType;
     private FrameLayout flContainer;
     private LinearLayout llError;
     private ImageView ivBaseIcon;
@@ -59,8 +72,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     private TextView tvBaseContent;
     private Button btnBase;
     private ProgressBar pbBase;
-    // member var
-    protected ErrorType errorType;
     private SearchListener listener;
 
     @Override
@@ -140,6 +151,98 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         getLayoutInflater().inflate(layoutResID, flContainer, true);
         super.setContentView(rlBase);
+    }
+
+    protected void setStatusBar(int color) {
+        StatusBarUtil.setStatusBarColor(this, color);
+    }
+
+    public void setLayoutFullScreen() {
+        final Window window = getWindow();
+        if (isNavigationBarAvailable() || hasSoftKeys()) {
+            /*if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+                window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            } else */
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                if (window != null) {
+                    window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+
+                    window.getDecorView().setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+                        @Override
+                        public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                            int navBarHeight = insets.getSystemWindowInsetBottom();
+                            if (navBarHeight != 0) {
+                                window.getDecorView().setPadding(0, 0, 0, navBarHeight);
+                            }
+                            return insets;
+                        }
+                    });
+                }
+            } else {
+                window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE |
+                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN);
+                }
+            }
+        } else {
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            }
+            setStatusBar(getResources().getColor(android.R.color.transparent));
+        }
+    }
+
+    public boolean isNavigationBarAvailable() {
+        boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
+        boolean hasHomeKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_HOME);
+
+        return (!(hasBackKey && hasHomeKey));
+    }
+
+    private boolean hasSoftKeys() {
+        boolean hasSoftwareKeys;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            Display d = this.getWindowManager().getDefaultDisplay();
+
+            DisplayMetrics realDisplayMetrics = new DisplayMetrics();
+            d.getRealMetrics(realDisplayMetrics);
+
+            int realHeight = realDisplayMetrics.heightPixels;
+            int realWidth = realDisplayMetrics.widthPixels;
+
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            d.getMetrics(displayMetrics);
+
+            int displayHeight = displayMetrics.heightPixels;
+            int displayWidth = displayMetrics.widthPixels;
+
+            hasSoftwareKeys = (realWidth - displayWidth) > 0 ||
+                    (realHeight - displayHeight) > 0;
+        } else {
+            boolean hasMenuKey = ViewConfiguration.get(this).hasPermanentMenuKey();
+            boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
+            hasSoftwareKeys = !hasMenuKey && !hasBackKey;
+        }
+        return hasSoftwareKeys;
+    }
+
+    protected void setBackgroundStatusBar(int backgroundColor, boolean isDarkColor) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Window window = getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(ContextCompat.getColor(this, android.R.color.transparent));
+            window.setBackgroundDrawableResource(backgroundColor);
+            getWindow().getDecorView().setSystemUiVisibility(isDarkColor ? View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR : 0);
+        } else {
+            Window window = getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        }
     }
 
     protected void setSearchListener(SearchListener listener) {

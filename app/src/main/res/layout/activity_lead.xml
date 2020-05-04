@@ -212,10 +212,17 @@
                 android:imeOptions="actionDone" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_img"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:itemCount="5"
+            tools:listitem="@layout/item_image" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spc_child">
+            android:layout_marginTop="@dimen/spc_parent">
 
             <Button
                 android:id="@+id/btn_cancel"

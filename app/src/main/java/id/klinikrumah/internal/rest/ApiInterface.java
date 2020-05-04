@@ -23,7 +23,6 @@ import retrofit2.http.Url;
 public interface ApiInterface {
     // Method
     String GET_LEAD_LIST = "getLeadList";
-    String GET_LEAD_DETAIL = "getLeadDetail/";
     String SAVE_LEAD = "saveLead";
     // Header
     String CONTENT_LENGTH = "Content-Length";
@@ -39,7 +38,7 @@ public interface ApiInterface {
     @GET(GET_LEAD_LIST)
     Call<JsonObject> getLeadList();
 
-    @GET(GET_LEAD_DETAIL)
+    @GET()
     Call<JsonObject> getLeadDetail(@Url String leadId);
 
     @FormUrlEncoded

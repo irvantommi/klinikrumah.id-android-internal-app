@@ -17,9 +17,9 @@ public class ApiClient {
     private static final String SCHEME = "http://";
     private static final String SCHEME_SECURE = "https://";
 
-    private static final String BASE_HOST = "irvandroid.com";
+    private static final String BASE_HOST = "api.irvandroid.com";
     private static final String BASE_VERSION = "/v1";
-    private static final String BASE_PATH = "/klinikrumah-api/index.php/apikr";// + BASE_VERSION;
+    private static final String BASE_PATH = "/klinikrumah" + BASE_VERSION;
     private static final String BASE_URL = SCHEME_SECURE + BASE_HOST + BASE_PATH + "/";
 
     private static final String G_API_HOST = "www.googleapis.com";
@@ -38,11 +38,28 @@ public class ApiClient {
     private static App app = App.getInstance();
 
     public static Retrofit getRetrofit() {
-        if (retrofit == null) {
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        Interceptor interceptor = new Interceptor() {
+            @Override
+            public Response intercept(@NotNull Chain chain) throws IOException {
+                Request original = chain.request();
+//                Request request = original.newBuilder()
+//                        .header(AUTHORIZATION, BEARER + app.getAccountGoogle().getGoogleToken())
+//                        .header(CONTENT_TYPE, CONTENT_TYPE_DEFAULT)
+//                        .method(original.method(), original.body())
+//                        .build();
+                return chain.proceed(original);
+            }
+        };
+        if (!httpClient.interceptors().contains(interceptor)) {
+            httpClient.addInterceptor(interceptor);
+            if (retrofit == null) {
+                retrofit = new Retrofit.Builder()
+                        .baseUrl(BASE_URL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .client(httpClient.build())
+                        .build();
+            }
         }
         return retrofit;
     }
