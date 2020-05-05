@@ -204,6 +204,13 @@
                 android:id="@+id/tv_todo"
                 style="@style/KRTextView.Black"
                 tools:text="Keterangan" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_file"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_file" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,9 +27,10 @@ import id.klinikrumah.internal.model.Action;
 import id.klinikrumah.internal.model.Client;
 import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.Project;
-import id.klinikrumah.internal.util.static_.CommonFunc;
 import id.klinikrumah.internal.util.enum_.ErrorType;
+import id.klinikrumah.internal.util.static_.CommonFunc;
 import id.klinikrumah.internal.view.adapter.ContactDetailAdapter;
+import id.klinikrumah.internal.view.adapter.FileAdapter;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,7 +39,8 @@ public class LeadDetailActivity extends BaseActivity {
     private static final String TITLE = "Detail Peminat";
     private static final String LEAD_ID = "lead_id";
     // other class
-    ContactDetailAdapter contactAdapter = new ContactDetailAdapter();
+    private ContactDetailAdapter contactAdapter = new ContactDetailAdapter();
+    private FileAdapter fileAdapter = new FileAdapter(true);
     // from xml
     private TextView tvClientName;
     private LinearLayout llLocation;
@@ -71,10 +74,6 @@ public class LeadDetailActivity extends BaseActivity {
         super.onResume();
         if (getIntent().hasExtra(LEAD_ID)) {
             getData();
-//            lead = gson.fromJson(getIntent().getStringExtra(LEAD_ID), Lead.class);
-//            if (lead != null) {
-//                setData();
-//            }
         } else {
             showError(ErrorType.GENERAL);
         }
@@ -102,6 +101,14 @@ public class LeadDetailActivity extends BaseActivity {
         tvSizeLand = findViewById(R.id.tv_size_land);
         tvDate = findViewById(R.id.tv_date);
         tvTodo = findViewById(R.id.tv_todo);
+        RecyclerView rvFile = findViewById(R.id.rv_file);
+        if (fileAdapter.getKrFileList().size() == 0) {
+            rvFile.setVisibility(View.GONE);
+        } else {
+            rvFile.setAdapter(fileAdapter);
+            rvFile.setLayoutManager(new GridLayoutManager(this, 4));
+            rvFile.setNestedScrollingEnabled(false);
+        }
         FloatingActionButton fabEdit = findViewById(R.id.fab_edit);
         fabEdit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,12 +161,15 @@ public class LeadDetailActivity extends BaseActivity {
 
     private void setData() {
         tvDescription.setText(setDefaultIfEmpty(lead.getDescription()));
-        tvBudget.setText(setDefaultIfEmpty(lead.getBudget()));
+        String budget = lead.getBudget();
+        tvBudget.setText(TextUtils.isEmpty(budget) ? S.DASH :
+                CommonFunc.formatRupiah(Double.parseDouble(budget)));
         tvTodo.setText(setDefaultIfEmpty(lead.getToDo()));
         tvDate.setText(setDefaultIfEmpty(lead.getCreateDate()));
         Client client = lead.getClient();
         if (client != null) {
             tvClientName.setText(setDefaultIfEmpty(client.getName()));
+            contactAdapter.clear();
             contactAdapter.addAll(client.getContactList());
         } else {
             tvClientName.setText(S.DASH);

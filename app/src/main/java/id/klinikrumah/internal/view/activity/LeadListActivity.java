@@ -145,7 +145,7 @@ public class LeadListActivity extends BaseActivity {
     }
 
     private void getData(boolean isFilter) {
-        if (adapter.getOriList().size() == 0) {
+        if (adapter.getFilteredList().size() == 0) {
             hideError();
             setContentVisibility(View.GONE);
             fabNew.setVisibility(View.GONE);
@@ -156,8 +156,9 @@ public class LeadListActivity extends BaseActivity {
                         Response<JsonObject> response) {
                     JsonObject data = processResponse(response);
                     if (data != null && data.has(LEAD_LIST)) {
-                        leadList = Arrays.asList(gson.fromJson(data.getAsJsonArray(LEAD_LIST)
-                                .toString(), Lead[].class));
+                        leadList = Arrays.asList(gson.fromJson(data.getAsJsonArray(LEAD_LIST).toString(),
+                                Lead[].class));
+                        adapter.clear();
                         adapter.addAll(leadList);
                         setContentVisibility(View.VISIBLE);
                         fabNew.setVisibility(View.VISIBLE);

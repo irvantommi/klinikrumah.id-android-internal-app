@@ -22,6 +22,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -107,6 +109,7 @@ public class CommonFunc {
         }
     }
 
+    // https://developer.android.com/guide/topics/ui/dialogs
     public static void showDialog(Activity activity, String msg, String negativeBtnTxt,
                                   DialogInterface.OnClickListener onClick) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
@@ -114,5 +117,10 @@ public class CommonFunc {
                 .setCancelable(false)
                 .setNegativeButton(negativeBtnTxt, onClick);
         dialogBuilder.create().show();
+    }
+
+    @NotNull
+    public static String formatRupiah(double number) {
+        return NumberFormat.getCurrencyInstance(new Locale("in", "ID")).format(number);
     }
 }

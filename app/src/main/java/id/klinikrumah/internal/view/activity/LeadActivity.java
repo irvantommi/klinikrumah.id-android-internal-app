@@ -17,7 +17,6 @@ import android.os.Environment;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -29,7 +28,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -46,6 +44,7 @@ import com.google.gson.JsonObject;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,15 +61,19 @@ import id.klinikrumah.internal.base.BaseActivity;
 import id.klinikrumah.internal.constant.S;
 import id.klinikrumah.internal.model.Action;
 import id.klinikrumah.internal.model.Client;
-import id.klinikrumah.internal.model.File;
+import id.klinikrumah.internal.model.KRFile;
 import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.Project;
 import id.klinikrumah.internal.util.enum_.ErrorType;
-import id.klinikrumah.internal.util.static_.CommonFunc;
 import id.klinikrumah.internal.util.image.CropImage;
 import id.klinikrumah.internal.util.image.InternalContentProvider;
+import id.klinikrumah.internal.util.static_.CommonFunc;
 import id.klinikrumah.internal.view.adapter.ContactAdapter;
-import id.klinikrumah.internal.view.adapter.ImageAdapter;
+import id.klinikrumah.internal.view.adapter.FileAdapter;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -81,10 +84,9 @@ public class LeadActivity extends BaseActivity {
     private static final String TITLE = "%s Peminat";
     private static final String LEAD = "lead";
     private static final String DATE_FORMAT = "dd/MM/yy";
-    private final String TAG = this.getClass().getSimpleName();
     // other class
     private ContactAdapter contactAdapter = new ContactAdapter();
-    private ImageAdapter imgAdapter = new ImageAdapter();
+    private FileAdapter fileAdapter = new FileAdapter(false);
     // from xml
     private TextInputEditText etClientName;
     private TextInputEditText etProjectLocation;
@@ -107,11 +109,8 @@ public class LeadActivity extends BaseActivity {
     private LocationCallback locationCallback;
     private Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
     private String state;
-    private java.io.File fileCamera, file;
-    private int fileMaxSize = 1000000;
+    private File fileCamera, file;
     private String fileId;
-    private int filePos;
-    private List<File> fileList = new ArrayList<>();
 
     public static void show(Context context, String lead) {
         Intent intent = new Intent(context, LeadActivity.class);
@@ -143,7 +142,7 @@ public class LeadActivity extends BaseActivity {
         etSizeLand = findViewById(R.id.et_size_land);
         etDate = findViewById(R.id.et_date);
         etTodo = findViewById(R.id.et_todo);
-        RecyclerView rvImg = findViewById(R.id.rv_img);
+        RecyclerView rvFile = findViewById(R.id.rv_file);
 
         btnLatLong.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,6 +153,34 @@ public class LeadActivity extends BaseActivity {
         rvContact.setAdapter(contactAdapter);
         rvContact.setLayoutManager(new LinearLayoutManager(this));
         rvContact.setNestedScrollingEnabled(false);
+        /*etBudget.addTextChangedListener(new TextWatcher() {
+            private String current = "";
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                if (!s.toString().equals(current)) {
+                    etBudget.removeTextChangedListener(this);
+                    String cleanString = s.toString().replaceAll("[Rp,.]", "");
+                    String formatted = CommonFunc.formatRupiah(Double.parseDouble(cleanString)/100);
+
+                    current = formatted;
+                    etBudget.setText(formatted);
+                    etBudget.setSelection(formatted.length());
+
+                    etBudget.addTextChangedListener(this);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });*/
         final DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
@@ -184,23 +211,22 @@ public class LeadActivity extends BaseActivity {
                 datePickerDialog.show();
             }
         });
-        imgAdapter.setTaskListener(new ImageAdapter.TaskListener() {
+        fileAdapter.setTaskListener(new FileAdapter.TaskListener() {
             @Override
             public void add(String id, int pos) {
                 checkPermissionReadWrite();
                 createFolder();
                 fileId = id;
-                filePos = pos;
             }
 
             @Override
             public void remove(int pos) {
-                imgAdapter.remove(pos);
+                fileAdapter.remove(pos);
             }
         });
-        rvImg.setAdapter(imgAdapter);
-        rvImg.setLayoutManager(new GridLayoutManager(this, 4));
-        rvImg.setNestedScrollingEnabled(false);
+        rvFile.setAdapter(fileAdapter);
+        rvFile.setLayoutManager(new GridLayoutManager(this, 4));
+        rvFile.setNestedScrollingEnabled(false);
         Button btnCancel = findViewById(R.id.btn_cancel);
         Button btnSubmit = findViewById(R.id.btn_submit);
         btnCancel.setOnClickListener(new View.OnClickListener() {
@@ -238,16 +264,16 @@ public class LeadActivity extends BaseActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
-//            deleteLocalFile(fileId); ??? kenapa  diapus ya tiap result_OK
+            int fileMaxSize = 1000000;
             if (requestCode == S.RequestCode.SETTING_RESULT) {
                 checkPermissionLocation();
             } else if (requestCode == S.RequestCode.OPEN_GALLERY) {
                 if (data != null) {
                     file = updateFileLocation(data.getData());
                     fileCamera = updateFileLocation(data.getData());
+                    copyStream(data.getData());
                 }
-                copyStream(data.getData());
-                if (getFileSize(new java.io.File(file.getPath())) <= fileMaxSize) {
+                if (getFileSize(new File(file.getPath())) <= fileMaxSize) {
                     startCropImage(file);
                 } else {
                     try {
@@ -264,7 +290,7 @@ public class LeadActivity extends BaseActivity {
                     }
                 }
             } else if (requestCode == S.RequestCode.TAKE_PICTURE) {
-                if (getFileSize(new java.io.File(fileCamera.getPath())) <= fileMaxSize) {
+                if (getFileSize(new File(fileCamera.getPath())) <= fileMaxSize) {
                     startCropImage(fileCamera);
                 } else {
                     CommonFunc.showDialog(this, getString(R.string.alert_max_file) + " " +
@@ -278,17 +304,15 @@ public class LeadActivity extends BaseActivity {
                 }
             } else if (requestCode == S.RequestCode.TAKE_PICTURE_WITH_CROP) {
                 addFile(data.getStringExtra(CropImage.IMAGE_PATH), "image");
-                setDataUpload(file.getName());
-                setDataUpload(fileCamera.getName());
-                imgAdapter.addAll(fileList);
-//                upload();
+//                setDataUpload(file.getName());
+//                setDataUpload(fileCamera.getName());
             } else if (requestCode == S.RequestCode.DOC) {
                 file = updateFileLocation(data.getData());
                 copyStream(data.getData());
                 String path = file.getPath();
-                if (getFileSize(new java.io.File(path)) <= fileMaxSize) {
+                if (getFileSize(new File(path)) <= fileMaxSize) {
                     addFile(path, "pdf");
-                    setDataUpload(file.getName());
+//                    setDataUpload(file.getName());
                 } else {
                     CommonFunc.showDialog(this, getString(R.string.alert_max_file) + " " +
                             fileMaxSize + " MB", "OK", new DialogInterface.OnClickListener() {
@@ -308,7 +332,7 @@ public class LeadActivity extends BaseActivity {
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         boolean isGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-//        boolean isDenied = grantResults[0] == PackageManager.PERMISSION_DENIED;
+
         if (permissions.length > 0 && isGranted) {
             String permission = permissions[0];
             switch (requestCode) {
@@ -330,25 +354,6 @@ public class LeadActivity extends BaseActivity {
                     break;
             }
         }
-    }
-
-    // https://developer.android.com/guide/topics/ui/dialogs
-    private void showPopUp() {
-        // Use the Builder class for convenient dialog construction
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.allow_location)
-                .setPositiveButton(R.string.allow, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS),
-                                S.RequestCode.SETTING_RESULT);
-                    }
-                })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                    }
-                });
-        builder.create().show();
     }
 
     private void checkPermissionLocation() {
@@ -415,9 +420,9 @@ public class LeadActivity extends BaseActivity {
 
     private void createFolder() {
         state = Environment.getExternalStorageState();
-        String path = String.format("%s/AloTemp", this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath());
-        file = new java.io.File(path);
-        fileCamera = new java.io.File(path);
+        String path = String.format("%s/KR_Temp", getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath());
+        file = new File(path);
+        fileCamera = new File(path);
         if (!file.exists()) {
             file.mkdir();
         }
@@ -497,10 +502,10 @@ public class LeadActivity extends BaseActivity {
     }
 
     @NotNull
-    private java.io.File createImageFile() throws IOException {
-        java.io.File file = java.io.File.createTempFile("JPEG" + "_", ".jpg",
+    private File createImageFile() throws IOException {
+        File file = File.createTempFile("JPEG" + "_", ".jpg",
                 getExternalFilesDir(Environment.DIRECTORY_PICTURES));
-        fileCamera = new java.io.File(file.getAbsolutePath());
+        fileCamera = new File(file.getAbsolutePath());
         return file;
     }
 
@@ -522,22 +527,10 @@ public class LeadActivity extends BaseActivity {
         startActivityForResult(Intent.createChooser(intent, "ChooseFile"), S.RequestCode.DOC);
     }
 
-    private void deleteLocalFile(String fieldId) {
-        for (int i = 0; i < fileList.size(); i++) {
-            if (fileList.get(i).getId().equals(fieldId)) {
-                new java.io.File(fileList.get(i).getPath()).delete();
-                fileList.remove(i);
-            }
-        }
-//        createClaimTriageAdapter = new CreateClaimTriageAdapter(this, dataFormClaimModels, claimMenuModels, claimCause, this);
-//        formClaimRv.setAdapter(createClaimTriageAdapter);
-    }
-
-    private java.io.File updateFileLocation(Uri data) {
+    private File updateFileLocation(Uri data) {
         boolean isMounted = Environment.MEDIA_MOUNTED.equals(state);
-        return new java.io.File(String.format("%s/KR_Temp", isMounted ?
-                this.getExternalFilesDir(Environment.DIRECTORY_PICTURES) : getFilesDir()),
-                String.format(getFileName(data), ""));
+        return new File(String.format("%s/KR_Temp", isMounted ? getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                : getFilesDir()), String.format(getFileName(data), ""));
     }
 
     public String getFileName(@NotNull Uri uri) {
@@ -580,7 +573,7 @@ public class LeadActivity extends BaseActivity {
         }
     }
 
-    private int getFileSize(@NotNull java.io.File file) {
+    private int getFileSize(@NotNull File file) {
         if (file.exists()) {
             String size = new DecimalFormat("0").format(file.length() / 1024 / 1024);
             Log.e("File", "File!" + " " + size);
@@ -591,7 +584,7 @@ public class LeadActivity extends BaseActivity {
         }
     }
 
-    private void startCropImage(@NonNull java.io.File file) {
+    private void startCropImage(@NonNull File file) {
         Intent intent = new Intent(this, CropImage.class);
         intent.putExtra(CropImage.IMAGE_PATH, file.getPath());
         intent.putExtra(CropImage.SCALE, true);
@@ -603,64 +596,64 @@ public class LeadActivity extends BaseActivity {
     }
 
     private void addFile(String path, String type) {
-        File file = new File();
-        file.setId(fileId);
-        file.setPath(path);
-        file.setType(type);
-        fileList.add(file);
+        KRFile krFile = new KRFile();
+        krFile.setId(fileId);
+        krFile.setPath(path);
+        krFile.setType(type);
+        fileAdapter.add(krFile);
+        etTodo.requestFocus();
     }
 
-    private void setDataUpload(String fileName) {
-        int document = 0;
-//        for (int i = 0; i < dataFormClaimModels.size(); i++) {
-//            if (dataFormClaimModels.get(i).getSection().equals("document")) {
-//                document = i;
-//            }
-//        }
-//        dataFormClaimModels.get(document).getFormFieldModels().get(positionUpload).setValue(fileName);
-//        createClaimTriageAdapter.notifyItemChanged(document);
-    }
-
-    // TODO: 29/04/20 https://futurestud.io/tutorials/retrofit-2-how-to-upload-files-to-server 
-    private void upload() {
-        File file = fileList.get(0);
-        String path = file.getPath();
-        java.io.File ioFile = new java.io.File(path);
-        Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+    // TODO: 29/04/20 https://futurestud.io/tutorials/retrofit-2-how-to-upload-files-to-server
+    private void upload(final int pos) {
+        KRFile krFile = fileAdapter.getKrFileList().get(pos);
+        String path = krFile.getPath();
+        File file = new File(path);
+        /*Intent shareIntent = ShareCompat.IntentBuilder.from(this)
                 .setText("Unggah Gambar/PDF")
                 .setType(S.MIME_TYPE_PDF)
                 .setType(S.MIME_TYPE_JPG)
-                .setStream(Uri.fromFile(ioFile) )
+                .setStream(Uri.fromFile(file))
                 .getIntent()
                 .setPackage(S.PKG_DRIVE);
-        startActivityForResult(shareIntent, S.RequestCode.G_DRIVE);
-        /*
-        // create RequestBody instance from ioFile
-        String type = getContentResolver().getType(Uri.fromFile(ioFile));
+        startActivityForResult(shareIntent, S.RequestCode.G_DRIVE);*/
+        // create RequestBody instance from file
+        String type = getContentResolver().getType(Uri.fromFile(file));
         if (type == null) {
-            type = image.getType();
+            type = krFile.getType();
         }
-        RequestBody requestFile = RequestBody.create(MediaType.parse(type + "/jpeg"), ioFile);
-        // MultipartBody.Part is used to send also the actual ioFile name
-        String fileName = ioFile.getName();
+        RequestBody requestFile = RequestBody.create(MediaType.parse(type + "/jpeg"), file);
+        // MultipartBody.Part is used to send also the actual file name
+        String fileName = file.getName();
         MultipartBody.Part body = MultipartBody.Part.createFormData("picture", fileName, requestFile);
         // add another part within the multipart request
-        RequestBody rgFileId = RequestBody.create(okhttp3.MultipartBody.FORM, image.getId());
+        RequestBody rgLeadId = RequestBody.create(okhttp3.MultipartBody.FORM, lead.getId());
+        RequestBody rbFileId = RequestBody.create(okhttp3.MultipartBody.FORM, krFile.getId());
         RequestBody rbFileName = RequestBody.create(okhttp3.MultipartBody.FORM, fileName);
 
-        Call<ResponseBody> upload = apiGoogle.upload(fileName.length(),
-                image.getType() + "/jpeg", (int) ioFile.length(), rgFileId, rbFileName, body);
+        final Call<ResponseBody> upload = api.upload(fileName.length(), krFile.getType()
+                + "/jpeg", (int) file.length(), rgLeadId, rbFileId, rbFileName, body);
         upload.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(@NotNull Call<ResponseBody> call, @NotNull Response<ResponseBody> response) {
                 response.body();
+//                JsonObject data = processResponse(response);
+//                if (data != null) {
+//                    if (fileAdapter.getKrFileList().size() == pos) {
+//                        toLeadDetail();
+//                    } else {
+//                        upload(pos + 1);
+//                    }
+//                } else {
+//                    showError(ErrorType.NOT_FOUND);
+//                }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e(TAG, "", t);
+            public void onFailure(@NotNull Call<ResponseBody> call, @NotNull Throwable t) {
+                onRetrofitFailure(t.toString());
             }
-        });*/
+        });
     }
 
     private void setData() {
@@ -723,19 +716,21 @@ public class LeadActivity extends BaseActivity {
         lead.setAction(action);
 
         showHideProgressBar();
-        api.saveLead(gson.toJson(lead)).enqueue(new Callback<JsonObject>() {
+        api.saveLead(lead).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
                 JsonObject data = processResponse(response);
                 if (data != null) {
-                    finish();
                     lead = gson.fromJson(data.toString(), Lead.class);
-                    LeadDetailActivity.show(LeadActivity.this, lead.getId());
-//                    LeadDetailActivity.show(LeadActivity.this, data.toString());
+                    if (fileAdapter.getKrFileList().size() == 0) {
+                        toLeadDetail();
+                    } else {
+                        upload(0);
+                    }
                 } else {
                     showError(ErrorType.NOT_FOUND);
                 }
-                showHideProgressBar();
+//                showHideProgressBar();
             }
 
             @Override
@@ -743,5 +738,10 @@ public class LeadActivity extends BaseActivity {
                 onRetrofitFailure(t.toString());
             }
         });
+    }
+
+    private void toLeadDetail() {
+        finish();
+        LeadDetailActivity.show(LeadActivity.this, lead.getId());
     }
 }

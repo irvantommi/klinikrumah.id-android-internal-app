@@ -9,7 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/bg_grey_rad5"
-        android:contentDescription="@string/app_name" />
+        android:contentDescription="@string/app_name"
+        android:scaleType="fitXY" />
 
     <Button
         android:id="@+id/btn_add"
@@ -26,7 +27,6 @@
         android:layout_height="@dimen/ic_small"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_margin="@dimen/spc_item"
         android:background="@color/red"
         android:text="@string/remove" />
 </RelativeLayout>

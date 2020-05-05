@@ -108,8 +108,8 @@ public class LeadAdapter extends RecyclerView.Adapter<LeadAdapter.ViewHolder> im
         };
     }
 
-    public List<Lead> getOriList() {
-        return oriList;
+    public List<Lead> getFilteredList() {
+        return filteredList;
     }
 
     public void clear() {

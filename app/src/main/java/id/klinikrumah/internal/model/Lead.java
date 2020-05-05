@@ -2,6 +2,8 @@ package id.klinikrumah.internal.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 import id.klinikrumah.internal.base.BaseModel;
 
 public class Lead extends BaseModel {
@@ -22,6 +24,9 @@ public class Lead extends BaseModel {
 
     @SerializedName("to_do")
     private String toDo;
+
+    @SerializedName("file_list")
+    private List<KRFile> krFileList;
 
     public Client getClient() {
         return client;
@@ -69,5 +74,13 @@ public class Lead extends BaseModel {
 
     public void setToDo(String toDo) {
         this.toDo = toDo;
+    }
+
+    public List<KRFile> getKrFileList() {
+        return krFileList;
+    }
+
+    public void setKrFileList(List<KRFile> krFileList) {
+        this.krFileList = krFileList;
     }
 }

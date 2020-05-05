@@ -1,13 +1,13 @@
 package id.klinikrumah.internal.model;
 
-public class File {
+public class KRFile {
     private String id;
     private String path;
     private String type;
 
-    public File(){}
+    public KRFile(){}
 
-    public File(String id, String path, String type){
+    public KRFile(String id, String path, String type){
         this.id = id;
         this.path = path;
         this.type = type;

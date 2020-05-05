@@ -4,11 +4,13 @@ import com.google.gson.JsonObject;
 
 import java.util.List;
 
+import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.User;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -34,6 +36,7 @@ public interface ApiInterface {
     String ID = "id";
     String NAME = "name";
     String LEAD = "lead";
+    String LEAD_ID = "lead_id";
 
     @GET(GET_LEAD_LIST)
     Call<JsonObject> getLeadList();
@@ -41,9 +44,8 @@ public interface ApiInterface {
     @GET()
     Call<JsonObject> getLeadDetail(@Url String leadId);
 
-    @FormUrlEncoded
     @POST(SAVE_LEAD)
-    Call<JsonObject> saveLead(@Field(LEAD) String jsonLead);
+    Call<JsonObject> saveLead(@Body Lead Lead);
 
     // google
     // https://futurestud.io/tutorials/retrofit-add-custom-request-header
@@ -58,6 +60,7 @@ public interface ApiInterface {
             @Header(CONTENT_LENGTH) int contentLength,
             @Header(X_UPLOAD_CONTENT_TYPE) String xUploadContentType,
             @Header(X_UPLOAD_CONTENT_LENGTH) int xUploadContentLength,
+            @Part(LEAD_ID) RequestBody leadId,
             @Part(ID) RequestBody fileId,
             @Part(NAME) RequestBody fileName,
             @Part MultipartBody.Part file
