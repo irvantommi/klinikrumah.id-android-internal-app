@@ -23,40 +23,31 @@
 
             <TextView
                 android:id="@+id/tv_project_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/KRTextView.Black"
                 android:drawableStart="@drawable/ic_home_black_24dp"
                 android:drawableLeft="@drawable/ic_home_black_24dp"
                 android:drawablePadding="@dimen/spc_content"
                 android:gravity="center_vertical"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/txt_small"
                 tools:text="Membangun Istana" />
 
             <TextView
                 android:id="@+id/tv_project_location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/KRTextView.Black"
                 android:layout_marginTop="@dimen/spc_content"
                 android:drawableStart="@drawable/ic_location_on_black_24dp"
                 android:drawableLeft="@drawable/ic_location_on_black_24dp"
                 android:drawablePadding="@dimen/spc_content"
                 android:gravity="center_vertical"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/txt_small"
                 tools:text="Jannatul Firdaus" />
 
             <TextView
                 android:id="@+id/tv_client_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/KRTextView.Black"
                 android:layout_marginTop="@dimen/spc_content"
                 android:drawableStart="@drawable/ic_person_outline_black_24dp"
                 android:drawableLeft="@drawable/ic_person_outline_black_24dp"
                 android:drawablePadding="@dimen/spc_content"
                 android:gravity="center_vertical"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/txt_small"
                 tools:text="Prof. Dr. Muhammad Irvan Tommi, Lc hafizhohullah ta'ala" />
         </LinearLayout>
 

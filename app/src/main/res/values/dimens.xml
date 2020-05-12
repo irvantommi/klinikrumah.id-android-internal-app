@@ -6,7 +6,6 @@
     <dimen name="txt_small">12sp</dimen>
     <dimen name="txt_big">16sp</dimen>
     <!-- EditText Height -->
-    <dimen name="et_height">44dp</dimen>
     <dimen name="et_padding_bottom">8dp</dimen>
     <!-- Button Height -->
     <dimen name="btn_height">32dp</dimen>

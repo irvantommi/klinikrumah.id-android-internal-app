@@ -62,4 +62,8 @@
     <string name="no_storage_card">Kartu Penyimpanan tidak terdeteksi</string>
     <string name="not_enough_space">Ruang tidak cukup</string>
     <string name="alert_max_file">Ukuran maksimal file dokumen di bawah </string>
+    <string name="email_mandatory">Email wajib diisi</string>
+    <string name="password_mandatory">Kata sandi wajib diisi</string>
+    <string name="email_invalid">Silakan masukkan email dengan format yang sesuai</string>
+    <string name="password_invalid">Silakan masukkan kata sandi minimal 6 karakter</string>
 </resources>

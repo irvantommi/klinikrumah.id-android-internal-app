@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 import id.klinikrumah.internal.App;
+import id.klinikrumah.internal.util.static_.CommonFunc;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -30,7 +31,7 @@ public class ApiClient {
     private static final String GDRIVE_UPLOAD_API = SCHEME_SECURE + G_API_HOST + GDRIVE_PATH_UPLOAD + "/";
 
     private static final String AUTHORIZATION = "Authorization";
-    private static final String BEARER = "Bearer ";
+    private static final String BEARER = "Bearer Token=";
     private static final String CONTENT_TYPE = "Content-Type";
     private static final String CONTENT_TYPE_DEFAULT = "application/json; charset=UTF-8";
     private static final String CONTENT_TYPE_MULTIPART = "multipart/related";
@@ -43,13 +44,18 @@ public class ApiClient {
         Interceptor interceptor = new Interceptor() {
             @Override
             public Response intercept(@NotNull Chain chain) throws IOException {
+                String authToken = app.getAuthToken();
                 Request original = chain.request();
-//                Request request = original.newBuilder()
-//                        .header(AUTHORIZATION, BEARER + app.getAccountGoogle().getGoogleToken())
-//                        .header(CONTENT_TYPE, CONTENT_TYPE_DEFAULT)
-//                        .method(original.method(), original.body())
-//                        .build();
-                return chain.proceed(original);
+                if (CommonFunc.isEmptyString(authToken)) {
+                    return chain.proceed(original);
+                } else {
+                    Request request = original.newBuilder()
+                            .header(AUTHORIZATION, BEARER + authToken)
+                            .header(CONTENT_TYPE, CONTENT_TYPE_DEFAULT)
+                            .method(original.method(), original.body())
+                            .build();
+                    return chain.proceed(request);
+                }
             }
         };
         if (!httpClient.interceptors().contains(interceptor)) {

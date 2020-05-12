@@ -2,10 +2,8 @@ package id.klinikrumah.internal.rest;
 
 import com.google.gson.JsonObject;
 
-import java.util.List;
-
 import id.klinikrumah.internal.model.Lead;
-import id.klinikrumah.internal.model.User;
+import id.klinikrumah.internal.model.KRUser;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -38,6 +36,9 @@ public interface ApiInterface {
     String LEAD = "lead";
     String LEAD_ID = "lead_id";
 
+    @POST("auth")
+    Call<JsonObject> login(@Body KRUser user);
+
     @GET(GET_LEAD_LIST)
     Call<JsonObject> getLeadList();
 
@@ -68,7 +69,7 @@ public interface ApiInterface {
 
     @FormUrlEncoded
     @PUT()
-    Call<User> resumeUpload(
+    Call<KRUser> resumeUpload(
             @Url String fileId, // "/fileId?uploadType=resumable" // https://futurestud.io/tutorials/retrofit-2-how-to-use-dynamic-urls-for-requests
             @Header(CONTENT_LENGTH) String contentLength,
             @Header(X_UPLOAD_CONTENT_TYPE) String xUploadContentType,
@@ -78,15 +79,8 @@ public interface ApiInterface {
 
     // template
     @FormUrlEncoded
-    @POST("auth")
-    Call<JsonObject> login(
-            @Field("email") String username,
-            @Field("password") String password
-    );
-
-    @FormUrlEncoded
     @PUT("update")
-    Call<User> updateUser(
+    Call<KRUser> updateUser(
             @Field("id") String id,
             @Field("email") String username,
             @Field("password") String password,
@@ -95,5 +89,5 @@ public interface ApiInterface {
 
     @FormUrlEncoded
     @HTTP(method = "DELETE", path = "user", hasBody = true)
-    Call<User> deleteUser(@Field("id") String id);
+    Call<KRUser> deleteUser(@Field("id") String id);
 }

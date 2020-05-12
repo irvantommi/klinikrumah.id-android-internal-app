@@ -4,9 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -18,19 +23,29 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.JsonObject;
 
 import org.jetbrains.annotations.NotNull;
 
 import id.klinikrumah.internal.R;
 import id.klinikrumah.internal.base.BaseActivity;
 import id.klinikrumah.internal.model.GoogleUserData;
+import id.klinikrumah.internal.model.KRUser;
+import id.klinikrumah.internal.util.static_.CommonFunc;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
     private static final int SIGN_IN_GOOGLE = 69;
     private final String TAG = this.getClass().getSimpleName();
     // from xml
+    private TextInputLayout tilEmail;
     private TextInputEditText etEmail;
+    private TextInputLayout tilPwd;
     private TextInputEditText etPwd;
+    private ImageView ivVisibility;
     private TextView tvForgotPwd;
     private Button btnLogin;
     private Button btnLoginByPhone;
@@ -42,6 +57,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 //    private
     // member var
     private GoogleSignInClient googleSignInClient;
+    private String email, pwd;
+    private boolean isPasswordShown = false;
 
     public static void show(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
@@ -56,8 +73,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         setContentView(R.layout.activity_login);
         ablBase.setVisibility(View.GONE);
         // findViews
+        tilEmail = findViewById(R.id.til_email);
         etEmail = findViewById(R.id.et_email);
+        tilPwd = findViewById(R.id.til_password);
         etPwd = findViewById(R.id.et_password);
+        ivVisibility = findViewById(R.id.iv_visibility);
         tvForgotPwd = findViewById(R.id.tv_forgot_pwd);
         btnLogin = findViewById(R.id.btn_login);
         btnLoginByPhone = findViewById(R.id.btn_login_by_phone);
@@ -66,6 +86,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         tvTnc = findViewById(R.id.tv_tnc);
         tvRegister = findViewById(R.id.tv_register);
         // setOnClickListener
+        etEmail.addTextChangedListener(new InputTextWatcher(etEmail));
+        etPwd.addTextChangedListener(new InputTextWatcher(etPwd));
+        ivVisibility.setOnClickListener(this);
         tvForgotPwd.setOnClickListener(this);
         btnLogin.setOnClickListener(this);
         btnLoginByPhone.setOnClickListener(this);
@@ -87,11 +110,24 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     @Override
     public void onClick(@NotNull View v) {
         switch (v.getId()) {
+            case R.id.iv_visibility:
+                if (!isPasswordShown) {
+                    isPasswordShown = true;
+                    ivVisibility.setImageResource(R.drawable.ic_visibility_off_black_24dp);
+                    etPwd.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                } else {
+                    isPasswordShown = false;
+                    ivVisibility.setImageResource(R.drawable.ic_visibility_black_24dp);
+                    etPwd.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                }
+                break;
             case R.id.tv_forgot_pwd:
 
                 break;
             case R.id.btn_login:
-                login();
+                if (isValidEmail() && isValidPassword()) {
+                    login();
+                }
                 break;
             case R.id.btn_login_by_phone:
 
@@ -194,7 +230,89 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         }
     }
 
+    private boolean isValidEmail() {
+        email = String.valueOf(etEmail.getText());
+        if (CommonFunc.isEmptyString(email)) {
+            tilEmail.setError(getString(R.string.email_mandatory));
+            etEmail.requestFocus();
+            return false;
+        } else if (!CommonFunc.isValidEmail(email)) {
+            tilEmail.setError(getString(R.string.email_invalid));
+            etEmail.requestFocus();
+            return false;
+        } else {
+            tilEmail.setErrorEnabled(false);
+        }
+        return true;
+    }
+
+    private boolean isValidPassword() {
+        pwd = String.valueOf(etPwd.getText());
+        if (CommonFunc.isEmptyString(pwd)) {
+            tilPwd.setError(getString(R.string.password_mandatory));
+            etPwd.requestFocus();
+            return false;
+        } else if (pwd.length() < 6) {
+            tilPwd.setError(getString(R.string.password_invalid));
+            etPwd.requestFocus();
+            return false;
+        } else {
+            tilPwd.setErrorEnabled(false);
+        }
+        return true;
+    }
+
     private void login() {
-        LeadListActivity.show(this);
+        KRUser user = new KRUser();
+        user.setDeviceId(CommonFunc.generateUID());
+        user.setEmail(email);
+        user.setPassword(pwd);
+        showHideProgressBar();
+        btnLogin.setEnabled(false);
+        api.login(user).enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+                LeadListActivity.show(LoginActivity.this);
+//                JsonObject data = processResponse(response);
+//                if (data != null) {
+//                    KRUser user = gson.fromJson(data.toString(), KRUser.class);
+//                    LeadListActivity.show(LoginActivity.this);
+//                } else {
+//                    showError(ErrorType.NOT_FOUND);
+//                }
+//                showHideProgressBar();
+            }
+
+            @Override
+            public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
+                onRetrofitFailure(t.toString());
+            }
+        });
+    }
+
+    private class InputTextWatcher implements TextWatcher {
+        private final View view;
+
+        private InputTextWatcher(View view) {
+            this.view = view;
+        }
+
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        public void afterTextChanged(Editable editable) {
+            switch (view.getId()) {
+                case R.id.et_email:
+                    tilEmail.setError("");
+                    break;
+
+                case R.id.et_password:
+                    tilPwd.setError("");
+                    break;
+            }
+        }
     }
 }

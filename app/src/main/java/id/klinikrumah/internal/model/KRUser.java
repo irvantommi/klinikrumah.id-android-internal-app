@@ -4,12 +4,15 @@ import com.google.gson.annotations.SerializedName;
 
 import id.klinikrumah.internal.base.BaseModel;
 
-public class User extends BaseModel {
+public class KRUser extends BaseModel {
     @SerializedName("email")
-    String email;
+    private String email;
 
     @SerializedName("password")
-    String password;
+    private String password;
+
+    @SerializedName("device_id")
+    private String deviceId;
 
     public String getEmail() {
         return email;
@@ -25,5 +28,13 @@ public class User extends BaseModel {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 }

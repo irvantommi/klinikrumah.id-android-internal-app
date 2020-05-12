@@ -4,19 +4,19 @@ import com.google.gson.annotations.SerializedName;
 
 public abstract class BaseModel {
     @SerializedName("id")
-    String id;
+    private String id;
 
     @SerializedName("name")
-    String name;
+    private String name;
 
     @SerializedName("create_date")
-    String createDate;
+    private String createDate;
 
     @SerializedName("update_at")
-    String updateAt;
+    private String updateAt;
 
     @SerializedName("is_delete")
-    boolean isDelete;
+    private boolean isDelete;
 
     public String getId() {
         return id;

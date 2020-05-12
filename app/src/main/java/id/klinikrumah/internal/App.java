@@ -60,6 +60,13 @@ public class App extends MultiDexApplication {
         SharedPref.putString(Pref.CACHE_ACCOUNT_GOOGLE, gson.toJson(userData));
     }
 
+    public String getAuthToken() {
+        return SharedPref.getString(Pref.CACHE_AUTH_TOKEN);
+    }
+
+    public void setAuthToken(String authToken) {
+        SharedPref.putString(Pref.CACHE_AUTH_TOKEN, authToken);
+    }
 //    public List<Interest> getUserInterestList() {
 //        String json = SharedPref.getString(Pref.CACHE, this, BaseID.Preferences.CACHE_USER_INTEREST_OBJECT);
 //        Interest[] objArray = getGson().fromJson(json, Interest[].class);
