@@ -14,6 +14,9 @@ public class KRUser extends BaseModel {
     @SerializedName("device_id")
     private String deviceId;
 
+    @SerializedName("login_by")
+    private String loginBy;
+
     public String getEmail() {
         return email;
     }
@@ -36,5 +39,13 @@ public class KRUser extends BaseModel {
 
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
+    }
+
+    public String getLoginBy() {
+        return loginBy;
+    }
+
+    public void setLoginBy(String loginBy) {
+        this.loginBy = loginBy;
     }
 }

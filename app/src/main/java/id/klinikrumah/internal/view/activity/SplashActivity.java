@@ -24,7 +24,7 @@ public class SplashActivity extends BaseActivity {
             public void run() {
                 // Check for existing Google Sign In account, if the user is already signed in,
                 // the GoogleSignInAccount will be non-null.
-                app.setLogin(GoogleSignIn.getLastSignedInAccount(SplashActivity.this) != null);
+//                app.setLogin(GoogleSignIn.getLastSignedInAccount(SplashActivity.this) != null);
                 if (app.isLogin()) {
                     LeadListActivity.show(SplashActivity.this);
                 } else {

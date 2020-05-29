@@ -8,4 +8,6 @@
     <color name="green">#00FF00</color>
     <color name="blue">#0000FF</color>
     <color name="yellow">#FFFF00</color>
+    <color name="fb">#486DB4</color>
+    <color name="google">#D94945</color>
 </resources>

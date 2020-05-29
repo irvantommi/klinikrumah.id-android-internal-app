@@ -16,22 +16,35 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.JsonObject;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import id.klinikrumah.internal.R;
 import id.klinikrumah.internal.base.BaseActivity;
+import id.klinikrumah.internal.constant.S;
 import id.klinikrumah.internal.model.GoogleUserData;
 import id.klinikrumah.internal.model.KRUser;
+import id.klinikrumah.internal.util.enum_.ErrorType;
 import id.klinikrumah.internal.util.static_.CommonFunc;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,12 +63,14 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private Button btnLogin;
     private Button btnLoginByPhone;
     private Button btnLoginByFb;
+    private LoginButton lbFb;
     private Button btnLoginByGoogle;
     private TextView tvTnc;
     private TextView tvRegister;
     // other class
 //    private
     // member var
+    private CallbackManager fbCallbackManager;
     private GoogleSignInClient googleSignInClient;
     private String email, pwd;
     private boolean isPasswordShown = false;
@@ -82,6 +97,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         btnLogin = findViewById(R.id.btn_login);
         btnLoginByPhone = findViewById(R.id.btn_login_by_phone);
         btnLoginByFb = findViewById(R.id.btn_login_by_fb);
+        lbFb = findViewById(R.id.lb_fb);
         btnLoginByGoogle = findViewById(R.id.btn_login_by_google);
         tvTnc = findViewById(R.id.tv_tnc);
         tvRegister = findViewById(R.id.tv_register);
@@ -96,6 +112,69 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         btnLoginByGoogle.setOnClickListener(this);
         tvTnc.setOnClickListener(this);
         tvRegister.setOnClickListener(this);
+        // init facebook
+        fbCallbackManager = CallbackManager.Factory.create();
+        lbFb.registerCallback(fbCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                GraphRequest request = GraphRequest.newMeRequest(
+                        AccessToken.getCurrentAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(JSONObject object, GraphResponse response) {
+                                if (object.has(S.REQ_EMAIL)) {
+                                    try {
+                                        email = object.getString(S.REQ_EMAIL);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    login(S.REQ_FB);
+                                } else {
+                                    showSnackBar(getString(R.string.error_general_content));
+                                }
+                            }
+                        });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,email,gender,first_name,last_name,picture");
+                request.setParameters(parameters);
+                request.executeAsync();
+//                https://developers.facebook.com/docs/facebook-login/android/?sdk=maven
+                /*AccessToken accessToken = AccessToken.getCurrentAccessToken();
+                boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+                if (isLoggedIn) {
+                    LoginManager.getInstance().retrieveLoginStatus(LoginActivity.this,
+                            new LoginStatusCallback() {
+                                @Override
+                                public void onCompleted(AccessToken accessToken) {
+                                    // User was previously logged in, can log them in directly here.
+                                    // If this callback is called, a popup notification appears that says
+                                    // "Logged in as <User Name>"
+                                }
+                                @Override
+                                public void onFailure() {
+                                    // No access token could be retrieved for the user
+                                }
+                                @Override
+                                public void onError(Exception exception) {
+                                    // An error occurred
+                                }
+                            });
+                } else {
+                    LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this,
+                            Collections.singletonList("public_profile,email"));
+                }*/
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException e) {
+                showSnackBar(e.getMessage());
+            }
+        });
         // initGoogle
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
@@ -122,27 +201,28 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 }
                 break;
             case R.id.tv_forgot_pwd:
-
+                showSnackBar(getString(R.string.coming_soon));
                 break;
             case R.id.btn_login:
                 if (isValidEmail() && isValidPassword()) {
-                    login();
+                    login(S.REQ_EMAIL);
                 }
                 break;
             case R.id.btn_login_by_phone:
-
+                showSnackBar(getString(R.string.coming_soon));
                 break;
             case R.id.btn_login_by_fb:
-
+                showSnackBar(getString(R.string.coming_soon));
+//                lbFb.performClick();
                 break;
             case R.id.btn_login_by_google:
                 startActivityForResult(googleSignInClient.getSignInIntent(), SIGN_IN_GOOGLE);
                 break;
             case R.id.tv_tnc:
-
+                showSnackBar(getString(R.string.coming_soon));
                 break;
             case R.id.tv_register:
-
+                showSnackBar(getString(R.string.coming_soon));
                 break;
         }
     }
@@ -168,14 +248,15 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     userData.setPhoto(account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : "");
                     app.setAccountGoogle(userData);
 //                    https://developers.google.com/identity/sign-in/android/disconnect
-//                    googleSignInClient.signOut()
-//                            .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-//                                @Override
-//                                public void onComplete(@NotNull Task<Void> task) {
-//
-//                                }
-//                            });
-                    login();
+                    googleSignInClient.signOut()
+                            .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NotNull Task<Void> task) {
+
+                                }
+                            });
+                    email = account.getEmail();
+                    login(S.REQ_GOOGLE);
                     /*GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
                             new NetHttpTransport(), new JacksonFactory())
                             // Specify the CLIENT_ID of the app that accesses the backend:
@@ -227,6 +308,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
                 showSnackBar(e.getLocalizedMessage());
             }
+        } else {
+            fbCallbackManager.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -262,25 +345,35 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         return true;
     }
 
-    private void login() {
+    private void login(String loginBy) {
         KRUser user = new KRUser();
+        user.setLoginBy(loginBy);
         user.setDeviceId(CommonFunc.generateUID());
         user.setEmail(email);
-        user.setPassword(pwd);
+        if (loginBy.equals(S.REQ_EMAIL)) {
+            user.setPassword(pwd);
+        }
         showHideProgressBar();
         btnLogin.setEnabled(false);
         api.login(user).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
-                LeadListActivity.show(LoginActivity.this);
-//                JsonObject data = processResponse(response);
-//                if (data != null) {
-//                    KRUser user = gson.fromJson(data.toString(), KRUser.class);
-//                    LeadListActivity.show(LoginActivity.this);
-//                } else {
-//                    showError(ErrorType.NOT_FOUND);
-//                }
-//                showHideProgressBar();
+                JsonObject data = processResponse(response);
+                if (data != null) {
+                    if (data.has(S.RSPNS_USER)) {
+                        app.setUser(gson.fromJson(data.getAsJsonObject(S.RSPNS_USER).toString(),
+                                KRUser.class));
+                    }
+                    if (data.has(S.RSPNS_AUTH_TOKEN)) {
+                        app.setAuthToken(data.get(S.RSPNS_AUTH_TOKEN).toString());
+                    }
+                    app.setLogin(true);
+                    finish();
+                    LeadListActivity.show(LoginActivity.this);
+                } else {
+                    showError(ErrorType.NOT_FOUND);
+                }
+                showHideProgressBar();
             }
 
             @Override

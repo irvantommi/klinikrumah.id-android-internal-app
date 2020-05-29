@@ -2,12 +2,15 @@ package id.klinikrumah.internal;
 
 import androidx.multidex.MultiDexApplication;
 
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import de.greenrobot.event.EventBus;
 import id.klinikrumah.internal.constant.Pref;
 import id.klinikrumah.internal.model.GoogleUserData;
+import id.klinikrumah.internal.model.KRUser;
 import id.klinikrumah.internal.util.static_.SharedPref;
 
 public class App extends MultiDexApplication {
@@ -28,6 +31,8 @@ public class App extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
 
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
         eventBus = new EventBus();
         GsonBuilder gsonBuilder = new GsonBuilder();
 //        gsonBuilder.registerTypeAdapter(Facebook.class, new FacebookDeserializer());
@@ -58,6 +63,14 @@ public class App extends MultiDexApplication {
 
     public void setAccountGoogle(GoogleUserData userData) {
         SharedPref.putString(Pref.CACHE_ACCOUNT_GOOGLE, gson.toJson(userData));
+    }
+
+    public KRUser getUser() {
+        return gson.fromJson(SharedPref.getString(Pref.CACHE_USER), KRUser.class);
+    }
+
+    public void setUser(KRUser user) {
+        SharedPref.putString(Pref.CACHE_USER, gson.toJson(user));
     }
 
     public String getAuthToken() {

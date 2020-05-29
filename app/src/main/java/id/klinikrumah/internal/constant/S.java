@@ -1,10 +1,16 @@
 package id.klinikrumah.internal.constant;
 
 public class S {
+    // request
+    public static final String REQ_EMAIL = "email";
+    public static final String REQ_GOOGLE = "google";
+    public static final String REQ_FB = "facebook";
     // response
     public static final String RSPNS_STATUS = "status";
     public static final String RSPNS_SUCCESS = "success";
     public static final String RSPNS_DATA = "data";
+    public static final String RSPNS_USER = "user";
+    public static final String RSPNS_AUTH_TOKEN = "auth_token";
     // Country Code
     public static final String CC_ID = "+62";
     // Mime Types

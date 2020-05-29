@@ -112,16 +112,22 @@
         style="@style/KRButton.Active"
         android:layout_width="match_parent"
         android:layout_marginTop="@dimen/spc_parent"
-        android:background="@color/blue"
+        android:background="@color/fb"
         android:text="@string/login_by_fb"
         android:textColor="@android:color/white" />
+
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/lb_fb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/btn_login_by_google"
         style="@style/KRButton.Active"
         android:layout_width="match_parent"
         android:layout_marginTop="@dimen/spc_parent"
-        android:background="@color/red"
+        android:background="@color/google"
         android:text="@string/login_by_google"
         android:textColor="@android:color/white" />
 

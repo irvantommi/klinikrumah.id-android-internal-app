@@ -136,7 +136,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String s) {
-                listener.onSearchChange(s);
+                if (listener != null) {
+                    listener.onSearchChange(s);
+                }
                 return false;
             }
         });
