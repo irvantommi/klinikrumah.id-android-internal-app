@@ -9,8 +9,14 @@ public abstract class BaseModel {
     @SerializedName("name")
     private String name;
 
+    @SerializedName("create_by")
+    private String createBy;
+
     @SerializedName("create_date")
     private String createDate;
+
+    @SerializedName("update_by")
+    private String updateBy;
 
     @SerializedName("update_at")
     private String updateAt;
@@ -34,12 +40,28 @@ public abstract class BaseModel {
         this.name = name;
     }
 
+    public String getCreateBy() {
+        return createBy;
+    }
+
+    public void setCreateBy(String createBy) {
+        this.createBy = createBy;
+    }
+
     public String getCreateDate() {
         return createDate;
     }
 
     public void setCreateDate(String createDate) {
         this.createDate = createDate;
+    }
+
+    public String getUpdateBy() {
+        return updateBy;
+    }
+
+    public void setUpdateBy(String updateBy) {
+        this.updateBy = updateBy;
     }
 
     public String getUpdateAt() {

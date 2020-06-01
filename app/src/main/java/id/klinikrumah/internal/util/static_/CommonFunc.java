@@ -15,6 +15,7 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -30,6 +33,8 @@ import java.util.regex.Pattern;
 import id.klinikrumah.internal.constant.S;
 
 public class CommonFunc {
+    private static final String DATE_FORMAT = "dd/MM/yy";
+
     @NotNull
     public static String generateUID() {
         return UUID.randomUUID().toString().replace(S.DASH, "");
@@ -98,7 +103,7 @@ public class CommonFunc {
     }
 
     public static boolean isGranted(Context context, String permission) {
-        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+        return ActivityCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
     public static void copyStream(@NonNull InputStream input, OutputStream output) throws IOException {
@@ -122,5 +127,9 @@ public class CommonFunc {
     @NotNull
     public static String formatRupiah(double number) {
         return NumberFormat.getCurrencyInstance(new Locale("in", "ID")).format(number);
+    }
+
+    public static String getStringFromDate(Date date) {
+        return new SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(date);
     }
 }

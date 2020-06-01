@@ -345,12 +345,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         return true;
     }
 
-    private void login(String loginBy) {
+    private void login(String loginWith) {
         KRUser user = new KRUser();
-        user.setLoginBy(loginBy);
+        user.setLoginWith(loginWith);
         user.setDeviceId(CommonFunc.generateUID());
         user.setEmail(email);
-        if (loginBy.equals(S.REQ_EMAIL)) {
+        if (loginWith.equals(S.REQ_EMAIL)) {
             user.setPassword(pwd);
         }
         showHideProgressBar();
@@ -371,7 +371,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     finish();
                     LeadListActivity.show(LoginActivity.this);
                 } else {
-                    showError(ErrorType.NOT_FOUND);
+                    showSnackBar("Email belum terdaftar, silakan hubungi admin");
+                    btnLogin.setEnabled(true);
                 }
                 showHideProgressBar();
             }
@@ -379,6 +380,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             @Override
             public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
                 onRetrofitFailure(t.toString());
+                btnLogin.setEnabled(true);
             }
         });
     }

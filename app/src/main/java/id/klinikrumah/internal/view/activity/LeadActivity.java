@@ -1,6 +1,7 @@
 package id.klinikrumah.internal.view.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.ActivityNotFoundException;
@@ -52,6 +53,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -83,7 +85,6 @@ public class LeadActivity extends BaseActivity {
     private static final int FASTEST_INTERVAL = 5000;
     private static final String TITLE = "%s Peminat";
     private static final String LEAD = "lead";
-    private static final String DATE_FORMAT = "dd/MM/yy";
     // other class
     private ContactAdapter contactAdapter = new ContactAdapter();
     private FileAdapter fileAdapter = new FileAdapter(false);
@@ -188,7 +189,7 @@ public class LeadActivity extends BaseActivity {
                 calendar.set(Calendar.MONTH, monthOfYear);
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-                etDate.setText(new SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(calendar.getTime()));
+                etDate.setText(CommonFunc.getStringFromDate(calendar.getTime()));
             }
         };
         final DatePickerDialog datePickerDialog = new DatePickerDialog(LeadActivity.this,
@@ -358,11 +359,14 @@ public class LeadActivity extends BaseActivity {
 
     private void checkPermissionLocation() {
         if (Build.VERSION.SDK_INT > 22) {
+            String accessCoarseLocation = Manifest.permission.ACCESS_COARSE_LOCATION;
             String accessFineLocation = Manifest.permission.ACCESS_FINE_LOCATION;
             List<String> permissionList = new ArrayList<>();
-            if (CommonFunc.isGranted(this, accessFineLocation)) {
+            if (CommonFunc.isGranted(this, accessCoarseLocation) &&
+                    CommonFunc.isGranted(this, accessFineLocation)) {
                 getLastLocation();
             } else {
+                permissionList.add(accessCoarseLocation);
                 permissionList.add(accessFineLocation);
                 String[] params = permissionList.toArray(new String[permissionList.size()]);
                 requestPermissions(params, S.RequestCode.LOCATION);
@@ -372,6 +376,7 @@ public class LeadActivity extends BaseActivity {
         }
     }
 
+    @SuppressLint("MissingPermission") // actually requestPermission in other method
     private void getLastLocation() {
         final FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationCallback = new LocationCallback() {
@@ -684,6 +689,13 @@ public class LeadActivity extends BaseActivity {
     }
 
     private void submitData() {
+        String email = app.getUser().getEmail();
+        if (isUpdate) {
+            lead.setUpdateBy(email);
+            lead.setUpdateAt(CommonFunc.getStringFromDate(new Date()));
+        } else {
+            lead.setCreateBy(email);
+        }
         lead.setDescription(setString(etDescription.getText()));
         lead.setBudget(setString(etBudget.getText()));
         lead.setToDo(setString(etTodo.getText()));
@@ -722,7 +734,8 @@ public class LeadActivity extends BaseActivity {
                 JsonObject data = processResponse(response);
                 if (data != null) {
                     lead = gson.fromJson(data.toString(), Lead.class);
-                    if (fileAdapter.getKrFileList().size() == 0) {
+                    List<KRFile> krFileList = fileAdapter.getKrFileList();
+                    if (krFileList.size() == 1 && krFileList.get(0).getId() == null) {
                         toLeadDetail();
                     } else {
                         upload(0);
