@@ -25,6 +25,7 @@ public class S {
     public static final String GMAP_SEARCH = "https://www.google.com/maps/search/%s";
     public static final String PKG_DRIVE = "com.google.android.apps.docs";
     public static final String TEMP_PHOTO_FILE_NAME = "klinikrumahid_ava.jpg";
+    public static final String LEAD_ID = "lead_id";
 
     public static final class RequestCode {
         public static final int OPEN_GALLERY = 0x1;

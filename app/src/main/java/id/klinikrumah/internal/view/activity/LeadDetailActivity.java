@@ -27,6 +27,7 @@ import id.klinikrumah.internal.model.Action;
 import id.klinikrumah.internal.model.Client;
 import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.Project;
+import id.klinikrumah.internal.service.LocalNotifService;
 import id.klinikrumah.internal.util.enum_.ErrorType;
 import id.klinikrumah.internal.util.static_.CommonFunc;
 import id.klinikrumah.internal.view.adapter.ContactDetailAdapter;
@@ -37,7 +38,6 @@ import retrofit2.Response;
 
 public class LeadDetailActivity extends BaseActivity {
     private static final String TITLE = "Detail Peminat";
-    private static final String LEAD_ID = "lead_id";
     // other class
     private ContactDetailAdapter contactAdapter = new ContactDetailAdapter();
     private FileAdapter fileAdapter = new FileAdapter(true);
@@ -63,7 +63,7 @@ public class LeadDetailActivity extends BaseActivity {
     public static void show(Context context, String leadId) {
         Intent intent = new Intent(context, LeadDetailActivity.class);
         Bundle b = new Bundle();
-        b.putString(LEAD_ID, leadId);
+        b.putString(S.LEAD_ID, leadId);
         intent.putExtras(b);
         context.startActivity(intent);
         ((Activity) context).overridePendingTransition(0, 0);
@@ -72,7 +72,7 @@ public class LeadDetailActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (getIntent().hasExtra(LEAD_ID)) {
+        if (getIntent().hasExtra(S.LEAD_ID)) {
             getData();
         } else {
             showError(ErrorType.GENERAL);
@@ -113,6 +113,9 @@ public class LeadDetailActivity extends BaseActivity {
         fabEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // TODO: 02/06/20 apus ini, buat ngetes doang 
+//                LocalNotifService service = new LocalNotifService();
+//                service.showNotif(LeadDetailActivity.this);
                 LeadActivity.show(LeadDetailActivity.this, gson.toJson(lead));
             }
         });
@@ -138,7 +141,7 @@ public class LeadDetailActivity extends BaseActivity {
     private void getData() {
         showHideProgressBar();
         hideError();
-        final String leadId = getIntent().getStringExtra(LEAD_ID);
+        final String leadId = getIntent().getStringExtra(S.LEAD_ID);
         api.getLeadDetail("getLeadDetail/" + leadId).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
