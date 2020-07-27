@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "449506311554",
+    "firebase_url": "https://sixth-foundry-275001.firebaseio.com",
+    "project_id": "sixth-foundry-275001",
+    "storage_bucket": "sixth-foundry-275001.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449506311554:android:4d76f383607dc7f628e39b",
+        "android_client_info": {
+          "package_name": "id.klinikrumah.internal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "449506311554-gsc5flm1afccgp6a3fqp4vklqmh9b1ql.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "id.klinikrumah.internal",
+            "certificate_hash": "77ffed592a52feb0e72b3b3d6b78002bb760b5a1"
+          }
+        },
+        {
+          "client_id": "449506311554-v11afks9lu7ekjl5oa86tnlatp6utrr1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHsy1zdgUmXfnYRtti5mKEgrg0YNY7GnU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "449506311554-v11afks9lu7ekjl5oa86tnlatp6utrr1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

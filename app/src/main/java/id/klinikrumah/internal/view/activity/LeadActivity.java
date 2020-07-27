@@ -228,6 +228,7 @@ public class LeadActivity extends BaseActivity {
         rvFile.setAdapter(fileAdapter);
         rvFile.setLayoutManager(new GridLayoutManager(this, 4));
         rvFile.setNestedScrollingEnabled(false);
+        rvFile.setVisibility(View.GONE);
         Button btnCancel = findViewById(R.id.btn_cancel);
         Button btnSubmit = findViewById(R.id.btn_submit);
         btnCancel.setOnClickListener(new View.OnClickListener() {
@@ -694,6 +695,7 @@ public class LeadActivity extends BaseActivity {
             lead.setUpdateBy(email);
             lead.setUpdateAt(CommonFunc.getStringFromDate(new Date()));
         } else {
+            lead.setId("");
             lead.setCreateBy(email);
         }
         lead.setDescription(setString(etDescription.getText()));

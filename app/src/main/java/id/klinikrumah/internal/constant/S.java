@@ -26,6 +26,9 @@ public class S {
     public static final String PKG_DRIVE = "com.google.android.apps.docs";
     public static final String TEMP_PHOTO_FILE_NAME = "klinikrumahid_ava.jpg";
     public static final String LEAD_ID = "lead_id";
+    public static final String TITLE = "title";
+    public static final String CONTENT = "content";
+    public static final String DESC = "description";
 
     public static final class RequestCode {
         public static final int OPEN_GALLERY = 0x1;

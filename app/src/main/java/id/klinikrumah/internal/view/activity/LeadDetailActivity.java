@@ -27,7 +27,6 @@ import id.klinikrumah.internal.model.Action;
 import id.klinikrumah.internal.model.Client;
 import id.klinikrumah.internal.model.Lead;
 import id.klinikrumah.internal.model.Project;
-import id.klinikrumah.internal.service.LocalNotifService;
 import id.klinikrumah.internal.util.enum_.ErrorType;
 import id.klinikrumah.internal.util.static_.CommonFunc;
 import id.klinikrumah.internal.view.adapter.ContactDetailAdapter;
